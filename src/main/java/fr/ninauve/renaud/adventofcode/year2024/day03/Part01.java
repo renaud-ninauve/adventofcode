@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Part01 {
-    public static Pattern MULTIPLY_PATTERN = Pattern.compile("mul\\((\\d{1,3}),(\\d{1,3})\\)");
+    public static final Pattern MULTIPLY_PATTERN = Pattern.compile("mul\\((\\d{1,3}),(\\d{1,3})\\)");
 
     public static void main(String... args) throws Exception {
         final String input = Files.readString(Path.of(Part01.class
