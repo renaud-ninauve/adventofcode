@@ -16,7 +16,7 @@ public class Part01 {
 
     public static void main(String... args) throws Exception {
         BufferedReader reader = Files.newBufferedReader(Path.of(Part02.class
-                .getResource("/fr/ninauve/renaud/adventofcode/year2024/day02/input.txt").toURI()), StandardCharsets.UTF_8);
+                .getResource("/year2024/day02/input.txt").toURI()), StandardCharsets.UTF_8);
 
         long count = reader.lines()
                 .map(Part01::isSafe)

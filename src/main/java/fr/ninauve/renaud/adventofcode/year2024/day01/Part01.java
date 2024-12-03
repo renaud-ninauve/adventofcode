@@ -10,7 +10,7 @@ public class Part01 {
 
     public static void main(String... args) throws Exception {
         List<String> lines = Files.readAllLines(Path.of(Part01.class
-                .getResource("/fr/ninauve/renaud/adventofcode/year2024/day01/input.txt").toURI()));
+                .getResource("/year2024/day01/input.txt").toURI()));
 
         List<Long> left = new ArrayList<>();
         List<Long> right = new ArrayList<>();
