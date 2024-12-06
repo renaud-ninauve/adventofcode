@@ -100,4 +100,5 @@ public class Part01 {
         }
         return guardPositions.size() - 1;
     }
+
 }
