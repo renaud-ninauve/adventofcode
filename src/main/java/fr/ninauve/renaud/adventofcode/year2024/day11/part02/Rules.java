@@ -1,5 +1,7 @@
 package fr.ninauve.renaud.adventofcode.year2024.day11.part02;
 
+import fr.ninauve.renaud.adventofcode.year2024.day11.part02.Numbers.NumberCount;
+
 import java.util.List;
 
 public class Rules {
@@ -7,19 +9,23 @@ public class Rules {
             new ZeroRule(), new EvenDigitsRule(), new DefaultRule()
     );
 
-    public void apply(Node<Long> head) {
-        Node<Long> current = head;
-        while (current != null) {
-            Node<Long> transformedNode = applyToNode(current);
-            current = transformedNode.next();
+    public Numbers apply(Numbers numbers) {
+        final Numbers result = new Numbers();
+        for (NumberCount currentNumberCount : numbers.counts()) {
+            List<Number> newNumbers = apply(currentNumberCount.number());
+            Long currentCount = currentNumberCount.count();
+            for (Number newNumber : newNumbers) {
+                result.add(new NumberCount(newNumber, currentCount));
+            }
         }
+        return result;
     }
 
-    public Node<Long> applyToNode(Node<Long> node) {
+    private List<Number> apply(Number value) {
         return rules.stream()
-                .filter(rule -> rule.matches(node))
+                .filter(rule -> rule.matches(value))
                 .findFirst()
-                .map(rule -> rule.apply(node))
+                .map(rule -> rule.apply(value))
                 .orElseThrow();
     }
 }
