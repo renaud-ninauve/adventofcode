@@ -2,8 +2,7 @@ package fr.ninauve.renaud.adventofcode.year2023.day03;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,14 +11,8 @@ class ColumnsGroupTest {
     @Test
     void neighbours() {
         ColumnsGroup group = new ColumnsGroup(3, 4, 7);
-        Set<Coordinates> actual = new HashSet<>(group.neighbours());
+        List<Coordinates> actual = group.neighbours();
         assertThat(actual).containsExactlyInAnyOrder(
-                // group
-                new Coordinates(3, 4),
-                new Coordinates(3, 5),
-                new Coordinates(3, 6),
-                new Coordinates(3, 7),
-
                 // up left
                 new Coordinates(2, 3),
 
