@@ -1,4 +1,4 @@
-package fr.ninauve.renaud.adventofcode.year2024.day11;
+package fr.ninauve.renaud.adventofcode.year2024.day11.part01;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
