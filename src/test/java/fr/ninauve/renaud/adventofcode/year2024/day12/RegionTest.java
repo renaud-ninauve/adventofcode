@@ -306,4 +306,34 @@ class RegionTest {
         Collection<Region> actual = Region.fromGrid(grid);
         assertThat(actual).hasSize(expectedRegions);
     }
+
+    @Test
+    void sides() {
+        Grid<CellContent> grid = Grid.fromInput(List.of(
+                "RRRRIICCFF",
+                "RRRRIICCCF",
+                "VVRRRCCFFF",
+                "VVRCCCJFFF",
+                "VVVVCJJCFE",
+                "VVIVCCJJEE",
+                "VVIIICJJEE",
+                "MIIIIIJJEE",
+                "MIIISIJEEE",
+                "MMMISSJEEE"
+        ));
+
+        Collection<Region> actual = Region.fromGrid(grid);
+
+        Map<CellContent, List<Integer>> allSides = actual.stream().collect(Collectors.groupingBy(Region::content, Collectors.mapping(r -> r.sides().size(), Collectors.toList())));
+
+        assertThat(allSides.get(new CellContent("R"))).containsExactlyInAnyOrder(10);
+        assertThat(allSides.get(new CellContent("I"))).containsExactlyInAnyOrder(4, 16);
+        assertThat(allSides.get(new CellContent("C"))).containsExactlyInAnyOrder(22, 4);
+        assertThat(allSides.get(new CellContent("F"))).containsExactlyInAnyOrder(12);
+        //assertThat(allSides.get(new CellContent("V"))).containsExactlyInAnyOrder(13L);
+        //assertThat(allSides.get(new CellContent("J"))).containsExactlyInAnyOrder(11L);
+        //assertThat(allSides.get(new CellContent("E"))).containsExactlyInAnyOrder(13L);
+        //assertThat(allSides.get(new CellContent("M"))).containsExactlyInAnyOrder(5L);
+        //assertThat(allSides.get(new CellContent("S"))).containsExactlyInAnyOrder(3L);
+    }
 }
