@@ -208,12 +208,42 @@ class RegionTest {
                 ),
                 Arguments.of(
                         List.of(
+                                "A.........",
+                                "AAAA......",
+                                "...AAAA...",
+                                "......AAA."
+                        ),
+                        3
+                ),
+                Arguments.of(
+                        List.of(
                                 "A.A",
                                 ".A.",
                                 "A.A"
                         ),
                         9
-                )
+                ),
+                Arguments.of(
+                        List.of(
+                                ".A.",
+                                "AAA",
+                                ".A."
+                        ),
+                        5
+                ),
+                Arguments.of(
+                        List.of(
+                                "....JJ......",
+                                "....J.......",
+                                "....JJJ.J...",
+                                "......J.J...",
+                                ".....JJJJJJ.",
+                                ".....JJJJ...",
+                                "......JJ....",
+                                "......J....."
+                        ),
+                        3
+                )                
         );
     }
 

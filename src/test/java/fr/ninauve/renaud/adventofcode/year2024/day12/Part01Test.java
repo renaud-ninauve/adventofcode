@@ -47,6 +47,8 @@ class Part01Test {
         final List<String> input = Files.readAllLines(Path.of(Part01.class
                 .getResource("/year2024/day12/input.txt").toURI()), StandardCharsets.UTF_8);
         long actual = Part01.solve(input);
+        // 640 regions
+        // part 2 ->  908042
         assertThat(actual).isEqualTo(1449902L);
     }
 }
