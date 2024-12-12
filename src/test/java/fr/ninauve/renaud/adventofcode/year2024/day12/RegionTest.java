@@ -208,12 +208,32 @@ class RegionTest {
                 ),
                 Arguments.of(
                         List.of(
+                                ".........A",
+                                "......AAAA",
+                                "...AAAA...",
+                                ".AAA......",
+                                ".........."
+                        ),
+                        2
+                ),
+                Arguments.of(
+                        List.of(
                                 "A.........",
                                 "AAAA......",
                                 "...AAAA...",
                                 "......AAA."
                         ),
                         3
+                ),
+                Arguments.of(
+                        List.of(
+                                "A.........",
+                                "AAAA......",
+                                "...AAAA...",
+                                "......AAA.",
+                                ".........."
+                        ),
+                        2
                 ),
                 Arguments.of(
                         List.of(
@@ -225,11 +245,31 @@ class RegionTest {
                 ),
                 Arguments.of(
                         List.of(
+                                ".....",
+                                ".A.A.",
+                                "..A..",
+                                ".A.A.",
+                                "....."
+                        ),
+                        6
+                ),
+                Arguments.of(
+                        List.of(
                                 ".A.",
                                 "AAA",
                                 ".A."
                         ),
                         5
+                ),
+                Arguments.of(
+                        List.of(
+                                ".....",
+                                "..A..",
+                                ".AAA.",
+                                "..A..",
+                                "....."
+                        ),
+                        2
                 ),
                 Arguments.of(
                         List.of(
@@ -243,7 +283,18 @@ class RegionTest {
                                 "......J....."
                         ),
                         3
-                )                
+                ),
+                Arguments.of(
+                        List.of(
+                                ".......",
+                                ".A...A.",
+                                ".AA.AA.",
+                                "..AAA..",
+                                "...A...",
+                                "......."
+                        ),
+                        2
+                )
         );
     }
 
