@@ -55,13 +55,20 @@ public record Region(CellContent content, Collection<Coordinates> coordinates) {
     }
 
     public Collection<Edge> sides() {
-        Set<Coordinates> edgesCoordinates = edges().stream()
-                .flatMap(edge -> Stream.of(edge.a(), edge.b()))
-                .collect(Collectors.toSet());
+        Map<Coordinates, Set<Coordinates>> edgesCoordinates = new HashMap<>();
+        for(Edge edge: edges()) {
+            Set<Coordinates> a = edgesCoordinates.getOrDefault(edge.a(), new HashSet<>());
+            a.add(edge.b());
+            edgesCoordinates.put(edge.a(), a);
+
+            Set<Coordinates> b = edgesCoordinates.getOrDefault(edge.b(), new HashSet<>());
+            b.add(edge.a());
+            edgesCoordinates.put(edge.b(), b);
+        }
 
         Collection<Edge> sides = new HashSet<>();
         Collection<Coordinates> visitedVertical = new HashSet<>();
-        for(Coordinates coordinates: edgesCoordinates) {
+        for(Coordinates coordinates: edgesCoordinates.keySet()) {
             if (visitedVertical.contains(coordinates)) {
                 continue;
             }
@@ -79,7 +86,7 @@ public record Region(CellContent content, Collection<Coordinates> coordinates) {
             visitedVertical.addAll(vertical);
         }
         Collection<Coordinates> visitedHorizontal = new HashSet<>();
-        for(Coordinates coordinates: edgesCoordinates) {
+        for(Coordinates coordinates: edgesCoordinates.keySet()) {
             if (visitedHorizontal.contains(coordinates)) {
                 continue;
             }
@@ -99,13 +106,13 @@ public record Region(CellContent content, Collection<Coordinates> coordinates) {
         return sides;
     }
 
-    private void visitSide(Set<Coordinates> edgesCoordinates, Coordinates current, Collection<Coordinates> visited, Coordinates delta) {
+    private void visitSide(Map<Coordinates, Set<Coordinates>> edgesCoordinates, Coordinates current, Collection<Coordinates> visited, Coordinates delta) {
         if (visited.contains(current)) {
             return;
         }
         visited.add(current);
         Coordinates next = current.moveOf(delta);
-        if (edgesCoordinates.contains(next)) {
+        if (edgesCoordinates.getOrDefault(current, new HashSet<>()).contains(next)) {
             visitSide(edgesCoordinates, next, visited, delta);
         }
     }
