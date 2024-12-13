@@ -2,6 +2,7 @@ package fr.ninauve.renaud.adventofcode.year2024.day13;
 
 import org.junit.jupiter.api.Test;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -29,7 +30,7 @@ class Part01Test {
 
     @Test
     void solve() {
-        long actual = Part01.solve(List.of(
+        BigInteger actual = Part01.solve(List.of(
                 "Button A: X+94, Y+34",
                 "Button B: X+22, Y+67",
                 "Prize: X=8400, Y=5400",
@@ -47,6 +48,6 @@ class Part01Test {
                 "Prize: X=18641, Y=10279"
         ));
 
-        assertThat(actual).isEqualTo(480L);
+        assertThat(actual).isEqualTo(BigInteger.valueOf(480));
     }
 }

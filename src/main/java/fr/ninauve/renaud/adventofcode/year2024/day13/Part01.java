@@ -1,5 +1,6 @@
 package fr.ninauve.renaud.adventofcode.year2024.day13;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,14 +23,14 @@ public class Part01 {
         System.out.println(Part01.solve(input));
     }
 
-    public static long solve(List<String> input) {
+    public static BigInteger solve(List<String> input) {
         List<Game> games = parse(input);
         return games.stream()
-                .mapToLong(game -> {
+                .map(game -> {
                     Machine machine = game.machine();
-                    Map<ButtonId, Long> clicks = machine.clicksFor(game.prize());
+                    Map<ButtonId, BigInteger> clicks = machine.clicksFor(game.prize());
                     return machine.price(clicks);
-                }).sum();
+                }).reduce(BigInteger.ZERO, BigInteger::add);
     }
 
     public static List<Game> parse(List<String> input) {
@@ -61,7 +62,7 @@ public class Part01 {
         Button buttonB = parseButton(bLineString);
         String prizeLineString = input.get(prizeLine.get());
         Location prize = parsePrize(prizeLineString);
-        return Optional.of(new Game(new Machine(List.of(buttonA, buttonB)), prize));
+        return Optional.of(new Game(new MachineUsingDFS(List.of(buttonA, buttonB)), prize));
     }
 
     public record Game(Machine machine, Location prize) {}

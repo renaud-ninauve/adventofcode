@@ -1,5 +1,6 @@
 package fr.ninauve.renaud.adventofcode.year2024.day13;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,14 +23,14 @@ public class Part02 {
         System.out.println(Part02.solve(input));
     }
 
-    public static long solve(List<String> input) {
+    public static BigInteger solve(List<String> input) {
         List<Game> games = parse(input);
         return games.stream()
-                .mapToLong(game -> {
+                .map(game -> {
                     Machine machine = game.machine();
-                    Map<ButtonId, Long> clicks = machine.clicksFor(game.prize());
+                    Map<ButtonId, BigInteger> clicks = machine.clicksFor(game.prize());
                     return machine.price(clicks);
-                }).sum();
+                }).reduce(BigInteger.ZERO, BigInteger::add);
     }
 
     public static List<Game> parse(List<String> input) {
@@ -61,7 +62,7 @@ public class Part02 {
         Button buttonB = parseButton(bLineString);
         String prizeLineString = input.get(prizeLine.get());
         Location prize = parsePrize(prizeLineString);
-        return Optional.of(new Game(new Machine(List.of(buttonA, buttonB)), prize));
+        return Optional.of(new Game(new MachineUsingMaths(List.of(buttonA, buttonB)), prize));
     }
 
     public record Game(Machine machine, Location prize) {}
@@ -80,7 +81,9 @@ public class Part02 {
     private static Location parsePrize(String line) {
         Matcher matcher = PRIZE_LINE.matcher(line);
         matcher.matches();
-        return new Location(Long.parseLong(matcher.group(1)) + 10000000000000L, Long.parseLong(matcher.group(2) + 10000000000000L));
+        Location delta = new Location(10000000000000L, 10000000000000L);
+        return new Location(Long.parseLong(matcher.group(1)), Long.parseLong(matcher.group(2)))
+                .add(delta);
     }
     private static Optional<Integer> findNextMatching(int index, List<String> lines, Pattern pattern) {
         for (int i = index; i < lines.size(); i++) {
