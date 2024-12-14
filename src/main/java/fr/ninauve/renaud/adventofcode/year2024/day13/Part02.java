@@ -82,6 +82,7 @@ public class Part02 {
         Matcher matcher = PRIZE_LINE.matcher(line);
         matcher.matches();
         Location delta = new Location(10000000000000L, 10000000000000L);
+        //Location delta = new Location(0L, 0L);
         return new Location(Long.parseLong(matcher.group(1)), Long.parseLong(matcher.group(2)))
                 .add(delta);
     }
