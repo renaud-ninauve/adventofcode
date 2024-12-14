@@ -29,9 +29,6 @@ public class Part02 {
                     .toList();
             Map<Location, List<Robot>> futureByPosition = futureRobots.stream()
                     .collect(Collectors.groupingBy(Robot::position));
-            if (futureByPosition.values().stream().allMatch(r -> r.size() == 1)) {
-                return steps;
-            }
             if (futureByPosition.size() == robots.size()) {
                 return steps;
             }
