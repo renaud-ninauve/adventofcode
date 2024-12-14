@@ -29,10 +29,31 @@ public class Part02 {
                     .toList();
             Map<Location, List<Robot>> futureByPosition = futureRobots.stream()
                     .collect(Collectors.groupingBy(Robot::position));
+
             if (futureByPosition.size() == robots.size()) {
+                print(futureRobots, area);
                 return steps;
             }
         }
         return 0L;
+    }
+
+    private static void print(List<Robot> robots, Area area) {
+        Map<Location, List<Robot>> robotByPosition = robots.stream().collect(Collectors.groupingBy(Robot::position));
+        for(int y=0; y<area.height(); y++) {
+            final StringBuilder line = new StringBuilder();
+            for(int x=0; x<area.width(); x++) {
+                Location position = new Location(x, y);
+                int nbRobots = robotByPosition.getOrDefault(position, List.of()).size();
+                if (nbRobots == 0) {
+                    line.append(" ");
+                } else if (nbRobots > 9) {
+                    line.append("X");
+                } else {
+                    line.append(nbRobots);
+                }
+            }
+            System.out.println(line);
+        }
     }
 }
