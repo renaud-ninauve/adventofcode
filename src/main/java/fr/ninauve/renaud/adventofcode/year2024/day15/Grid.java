@@ -68,10 +68,47 @@ public class Grid {
         Cell target = cell.moveOf(delta);
         CellContent targetContent = cells.get(target);
 
+        if (targetContent == CellContent.BOX) {
+            List<Cell> cellsToMove = new ArrayList<>();
+            cellsToMove.add(cell);
+            cellsToMove.add(target);
+            moveBox(cellsToMove, delta);
+            doMove(cellsToMove, delta);
+            return;
+        }
         if (targetContent != CellContent.EMPTY) {
             return;
         }
         cells.put(cell, CellContent.EMPTY);
         cells.put(target, content);
+    }
+
+    private void doMove(List<Cell> cellsToMove, Cell delta) {
+        List<CellContent> contents = cellsToMove.stream()
+                .map(this::get)
+                .toList();
+        for(int i=0; i<cellsToMove.size(); i++) {
+            Cell cell = cellsToMove.get(i);
+            CellContent content = contents.get(i);
+            Cell target = cell.moveOf(delta);
+            cells.put(target, content);
+        }
+        cells.put(cellsToMove.getFirst(), CellContent.EMPTY);
+    }
+
+    private void moveBox(List<Cell> cellsToMove, Cell delta) {
+        Cell next = cellsToMove.getLast().moveOf(delta);
+        CellContent nextContent = cells.get(next);
+        if (nextContent == CellContent.WALL) {
+            cellsToMove.clear();
+            return;
+        }
+        if (nextContent == CellContent.EMPTY) {
+            return;
+        }
+        if (nextContent == CellContent.BOX) {
+            cellsToMove.add(next);
+            moveBox(cellsToMove, delta);
+        }
     }
 }
