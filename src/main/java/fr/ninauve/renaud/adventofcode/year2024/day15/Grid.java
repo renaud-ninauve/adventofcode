@@ -65,7 +65,13 @@ public class Grid {
 
     private void move(Cell cell, Cell delta) {
         CellContent content = cells.get(cell);
+        Cell target = cell.moveOf(delta);
+        CellContent targetContent = cells.get(target);
+
+        if (targetContent != CellContent.EMPTY) {
+            return;
+        }
         cells.put(cell, CellContent.EMPTY);
-        cells.put(cell.moveOf(delta), content);
+        cells.put(target, content);
     }
 }
