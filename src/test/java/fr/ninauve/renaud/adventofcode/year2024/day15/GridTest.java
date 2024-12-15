@@ -10,7 +10,7 @@ class GridTest {
 
     @Test
     void fromInput() {
-        Grid<CellContent> actual = Grid.fromInput(List.of(
+        Grid actual = Grid.fromInput(List.of(
                 "#O.@",
                 "####"
         ));
@@ -26,5 +26,33 @@ class GridTest {
         assertThat(actual.get(new Cell(1, 1))).isEqualTo(CellContent.WALL);
         assertThat(actual.get(new Cell(1, 2))).isEqualTo(CellContent.WALL);
         assertThat(actual.get(new Cell(1, 3))).isEqualTo(CellContent.WALL);
+    }
+
+    @Test
+    void move() {
+        Grid grid = Grid.fromInput(List.of(
+                "########",
+                "#..O.O.#",
+                "##@.O..#",
+                "#...O..#",
+                "#.#.O..#",
+                "#...O..#",
+                "#......#",
+                "########"
+        ));
+
+        Cell robot = grid.find(CellContent.ROBOT).getFirst();
+        grid.move(robot, Move.UP);
+
+        assertThat(grid.toOutput()).containsExactly(
+                "########",
+                "#.@O.O.#",
+                "##..O..#",
+                "#...O..#",
+                "#.#.O..#",
+                "#...O..#",
+                "#......#",
+                "########"
+        );
     }
 }

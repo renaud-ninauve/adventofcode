@@ -7,7 +7,7 @@ import java.util.stream.IntStream;
 
 @Data
 public class GameInput {
-    private final Grid<CellContent> grid;
+    private final Grid grid;
     private final List<Move> moves;
 
     public static GameInput fromInput(List<String> input) {
@@ -16,7 +16,7 @@ public class GameInput {
                 .findFirst()
                 .orElseThrow();
 
-        Grid<CellContent> grid = Grid.fromInput(input.subList(0, emptyLine));
+        Grid grid = Grid.fromInput(input.subList(0, emptyLine));
         List<Move> moves = Move.fromInput(input.subList(emptyLine + 1, input.size()));
         return new GameInput(grid, moves);
     }

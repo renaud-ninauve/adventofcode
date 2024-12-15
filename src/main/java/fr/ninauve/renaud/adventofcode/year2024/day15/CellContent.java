@@ -3,12 +3,14 @@ package fr.ninauve.renaud.adventofcode.year2024.day15;
 import java.util.Arrays;
 
 public enum CellContent {
-    ROBOT("@"), WALL("#"), EMPTY("."), BOX("O");
+    ROBOT("@", false), WALL("#", false), EMPTY(".", false), BOX("O", true);
 
     private final String symbol;
+    private final boolean moveable;
 
-    CellContent(String symbol) {
+    CellContent(String symbol, boolean moveable) {
         this.symbol = symbol;
+        this.moveable = moveable;
     }
 
     public static CellContent fromSymbol(String symbol) {
@@ -16,5 +18,9 @@ public enum CellContent {
                 .filter(content -> content.symbol.equals(symbol))
                 .findFirst()
                 .orElseThrow();
+    }
+
+    public String symbol() {
+        return symbol;
     }
 }
