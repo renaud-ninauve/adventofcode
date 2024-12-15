@@ -84,6 +84,9 @@ public class Grid {
     }
 
     private void doMove(List<Cell> cellsToMove, Cell delta) {
+        if (cellsToMove.isEmpty()) {
+            return;
+        }
         List<CellContent> contents = cellsToMove.stream()
                 .map(this::get)
                 .toList();
