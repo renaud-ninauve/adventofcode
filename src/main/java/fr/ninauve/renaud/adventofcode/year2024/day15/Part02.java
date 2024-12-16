@@ -26,7 +26,9 @@ public class Part02 {
             Cell robot = grid.find(CellContent.ROBOT).getFirst();
             grid.move(robot, move);
         }
-        System.out.println(grid.toOutput());
+        for(String line: grid.toOutput()) {
+            System.out.println(line);
+        }
         return grid.find(CellContent.LEFT_BOX).stream()
                 .mapToLong(cell -> cell.getRow() * 100L + cell.getCol())
                 .sum();
