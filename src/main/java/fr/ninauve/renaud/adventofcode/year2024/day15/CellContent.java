@@ -1,11 +1,15 @@
 package fr.ninauve.renaud.adventofcode.year2024.day15;
 
+import lombok.Getter;
+
 import java.util.Arrays;
 
 public enum CellContent {
-    ROBOT("@", false), WALL("#", false), EMPTY(".", false), BOX("O", true);
+    ROBOT("@", false), WALL("#", false), EMPTY(".", false),
+    BOX("O", true), LEFT_BOX("[", true), RIGHT_BOX("]", true);
 
     private final String symbol;
+    @Getter
     private final boolean moveable;
 
     CellContent(String symbol, boolean moveable) {
@@ -23,4 +27,5 @@ public enum CellContent {
     public String symbol() {
         return symbol;
     }
+
 }

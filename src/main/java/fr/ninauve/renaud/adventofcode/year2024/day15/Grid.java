@@ -68,10 +68,9 @@ public class Grid {
         Cell target = cell.moveOf(delta);
         CellContent targetContent = cells.get(target);
 
-        if (targetContent == CellContent.BOX) {
+        if (targetContent.isMoveable()) {
             List<Cell> cellsToMove = new ArrayList<>();
             cellsToMove.add(cell);
-            cellsToMove.add(target);
             moveBox(cellsToMove, delta);
             doMove(cellsToMove, delta);
             return;
@@ -90,13 +89,18 @@ public class Grid {
         List<CellContent> contents = cellsToMove.stream()
                 .map(this::get)
                 .toList();
-        for(int i=0; i<cellsToMove.size(); i++) {
+        for (int i = 0; i < cellsToMove.size(); i++) {
             Cell cell = cellsToMove.get(i);
             CellContent content = contents.get(i);
             Cell target = cell.moveOf(delta);
             cells.put(target, content);
         }
-        cells.put(cellsToMove.getFirst(), CellContent.EMPTY);
+        for (Cell cell : cellsToMove) {
+            Cell previous = cell.moveOf(delta.multiply(-1));
+            if (!cellsToMove.contains(previous)) {
+                cells.put(cell, CellContent.EMPTY);
+            }
+        }
     }
 
     private void moveBox(List<Cell> cellsToMove, Cell delta) {
@@ -109,9 +113,41 @@ public class Grid {
         if (nextContent == CellContent.EMPTY) {
             return;
         }
-        if (nextContent == CellContent.BOX) {
+        if (nextContent == CellContent.BOX
+                || nextContent == CellContent.LEFT_BOX && Move.RIGHT.delta().equals(delta)
+                || nextContent == CellContent.RIGHT_BOX && Move.RIGHT.delta().equals(delta)
+                || nextContent == CellContent.LEFT_BOX && Move.LEFT.delta().equals(delta)
+                || nextContent == CellContent.RIGHT_BOX && Move.LEFT.delta().equals(delta)) {
             cellsToMove.add(next);
             moveBox(cellsToMove, delta);
+        } else if (nextContent == CellContent.LEFT_BOX) {
+            cellsToMove.add(next);
+            moveBox(cellsToMove, delta);
+            if (cellsToMove.isEmpty()) {
+                return;
+            }
+            List<Cell> rightCellsToMove = new ArrayList<>();
+            rightCellsToMove.add(next.moveOf(Move.RIGHT.delta()));
+            moveBox(rightCellsToMove, delta);
+            if (rightCellsToMove.isEmpty()) {
+                cellsToMove.clear();
+            } else {
+                cellsToMove.addAll(rightCellsToMove);
+            }
+        } else if (nextContent == CellContent.RIGHT_BOX) {
+            cellsToMove.add(next);
+            moveBox(cellsToMove, delta);
+            if (cellsToMove.isEmpty()) {
+                return;
+            }
+            List<Cell> leftCellsToMove = new ArrayList<>();
+            leftCellsToMove.add(next.moveOf(Move.LEFT.delta()));
+            moveBox(leftCellsToMove, delta);
+            if (leftCellsToMove.isEmpty()) {
+                cellsToMove.clear();
+            } else {
+                cellsToMove.addAll(leftCellsToMove);
+            }
         }
     }
 }

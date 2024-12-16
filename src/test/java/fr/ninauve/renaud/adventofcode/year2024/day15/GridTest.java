@@ -35,6 +35,7 @@ class GridTest {
     static Stream<Arguments> move() {
         return Stream.of(
                 Arguments.of(
+                        "1",
                         List.of(
                                 "########",
                                 "#......#",
@@ -52,6 +53,7 @@ class GridTest {
                         )
                 ),
                 Arguments.of(
+                        "2",
                         List.of(
                                 "########",
                                 "#..@...#",
@@ -69,6 +71,7 @@ class GridTest {
                         )
                 ),
                 Arguments.of(
+                        "3",
                         List.of(
                                 "########",
                                 "#......#",
@@ -86,6 +89,7 @@ class GridTest {
                         )
                 ),
                 Arguments.of(
+                        "4",
                         List.of(
                                 "########",
                                 "#......#",
@@ -105,6 +109,7 @@ class GridTest {
                         )
                 ),
                 Arguments.of(
+                        "5",
                         List.of(
                                 "########",
                                 "#..O...#",
@@ -122,6 +127,7 @@ class GridTest {
                         )
                 ),
                 Arguments.of(
+                        "6",
                         List.of(
                                 "########",
                                 "#......#",
@@ -139,6 +145,7 @@ class GridTest {
                         )
                 ),
                 Arguments.of(
+                        "7",
                         List.of(
                                 "########",
                                 "#......#",
@@ -156,6 +163,7 @@ class GridTest {
                         )
                 ),
                 Arguments.of(
+                        "8",
                         List.of(
                                 "########",
                                 "#......#",
@@ -175,6 +183,7 @@ class GridTest {
                         )
                 ),
                 Arguments.of(
+                        "9",
                         List.of(
                                 "########",
                                 "#......#",
@@ -183,7 +192,7 @@ class GridTest {
                                 "#......#",
                                 "########"
                         ),
-                        Move.LEFT,
+                        Move.RIGHT,
                         List.of(
                                 "########",
                                 "#......#",
@@ -194,6 +203,7 @@ class GridTest {
                         )
                 ),
                 Arguments.of(
+                        "10",
                         List.of(
                                 "########",
                                 "#......#",
@@ -202,7 +212,7 @@ class GridTest {
                                 "#......#",
                                 "########"
                         ),
-                        Move.LEFT,
+                        Move.RIGHT,
                         List.of(
                                 "########",
                                 "#......#",
@@ -211,13 +221,75 @@ class GridTest {
                                 "#......#",
                                 "########"
                         )
+                ),
+                Arguments.of(
+                        "11",
+                        List.of(
+                                "########",
+                                "#..[]..#",
+                                "#.[]...#",
+                                "#..@...#",
+                                "########"
+                        ),
+                        Move.UP,
+                        List.of(
+                                "########",
+                                "#..[]..#",
+                                "#.[]...#",
+                                "#..@...#",
+                                "########"
+                        )
+                ),
+                Arguments.of(
+                        "12",
+                        List.of(
+                                "########",
+                                "#......#",
+                                "#.[][].#",
+                                "#..[]..#",
+                                "#.[]...#",
+                                "#..@...#",
+                                "########"
+                        ),
+                        Move.UP,
+                        List.of(
+                                "########",
+                                "#.[][].#",
+                                "#..[]..#",
+                                "#.[]...#",
+                                "#..@...#",
+                                "#......#",
+                                "########"
+                        )
+                ),
+                Arguments.of(
+                        "13",
+                        List.of(
+                                "########",
+                                "#......#",
+                                "#.[]#..#",
+                                "#..[]..#",
+                                "#.[]...#",
+                                "#..@...#",
+                                "########"
+                        ),
+                        Move.UP,
+                        List.of(
+                                "########",
+                                "#......#",
+                                "#.[]#..#",
+                                "#..[]..#",
+                                "#.[]...#",
+                                "#..@...#",
+                                "########"
+                        )
                 )
         );
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0}")
     @MethodSource
-    void move(List<String> input, Move move, List<String> expected) {
+    void move(String title, List<String> input, Move move, List<String> expected) {
         Grid grid = Grid.fromInput(input);
 
         Cell robot = grid.find(CellContent.ROBOT).getFirst();
