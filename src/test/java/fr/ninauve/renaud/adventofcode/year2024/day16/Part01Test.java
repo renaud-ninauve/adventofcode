@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.in;
 
 class Part01Test {
 
@@ -45,6 +46,49 @@ class Part01Test {
                 "#^>...#...#.#.#",
                 "#^###.#.#.#.#.#",
                 "#S..#.....#...#",
+                "###############"
+        );
+    }
+
+    @Test
+    void findMinActions() {
+        List<String> input = List.of(
+                "###############",
+                "#.......#....E#",
+                "#.#.###.#.###.#",
+                "#.....#.#...#.#",
+                "#.###.#####.#.#",
+                "#.#.#.......#.#",
+                "#.#.#####.###.#",
+                "#...........#.#",
+                "###.#.#####.#.#",
+                "#...#.....#.#.#",
+                "#.#.#.###.#.#.#",
+                "#.....#...#.#.#",
+                "#.###.#.#.#.#.#",
+                "#S..#.....#...#",
+                "###############"
+        );
+        Grid grid = Grid.fromInput(input);
+        List<Action> actions = Part01.findMinActions(input);
+
+        List<String> actual = Part01.toOutput(grid, actions);
+
+        assertThat(actual).containsExactly(
+                "###############",
+                "#.......#....E#",
+                "#.#.###.#.###^#",
+                "#.....#.#...#^#",
+                "#.###.#####.#^#",
+                "#.#.#.......#^#",
+                "#.#.#####.###^#",
+                "#..>>>>>>>>v#^#",
+                "###^#.#####v#^#",
+                "#>>^#.....#v#^#",
+                "#^#.#.###.#v#^#",
+                "#^....#...#v#^#",
+                "#^###.#.#.#v#^#",
+                "#S..#.....#>>^#",
                 "###############"
         );
     }
