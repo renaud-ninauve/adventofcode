@@ -54,43 +54,63 @@ public class Part01 {
         Cell start = grid.find(CellContent.START).getFirst();
         Cell exit = grid.find(CellContent.EXIT).getFirst();
         int direction = 0;
-        List<Action> minActions = new ArrayList<>();
-        findMinActions(minActions, exit, new State(start, direction), new ArrayList<>(), new ArrayList<>());
-        return minActions;
+        Map<State, List<Action>> minActions = new HashMap<>();
+        findMinActions(grid, exit, List.of(new Context(new State(start, direction), new ArrayList<>())), minActions);
+        return minActions.get(exit);
     }
 
-    private static void findMinActions(List<Action> minActions, Cell target, State current, List<Action> currentActions, List<State> visited) {
-        Cell position = current.position();
-        int direction = current.direction;
-        if (visited.contains(current)) {
-            return;
+    private static void findMinActions(Grid grid, Cell target, List<Context> contexts, Map<State, List<Action>> minForState) {
+        final List<Context> newContexts = new ArrayList<>();
+        for (Context context : contexts) {
+            Cell position = context.state().position();
+            int direction = context.state().direction();
+            List<Action> actions = context.actions();
+
+            Cell delta = DELTAS_CLOCKWISE.get(direction);
+            List<Action> straightActions = new ArrayList<>(actions);
+            straightActions.add(Action.MOVE_STRAIGHT);
+            newContexts.add(new Context(new State(position.moveOf(delta), direction), straightActions));
+
+            int clockDirection = (direction + 1) % DELTAS_CLOCKWISE.size();
+            List<Action> clockActions = new ArrayList<>(actions);
+            straightActions.add(Action.TURN_CLOCKWISE);
+            newContexts.add(new Context(new State(position, clockDirection), clockActions));
+
+            int counterClockDirection = (DELTAS_CLOCKWISE.size() + direction - 1) % DELTAS_CLOCKWISE.size();
+            List<Action> counterClockActions = new ArrayList<>(actions);
+            counterClockActions.add(Action.TURN_COUNTERCLOCKWISE);
+            newContexts.add(new Context(new State(position, counterClockDirection), counterClockActions));
         }
-        visited.add(current);
-        if (position.equals(target)) {
-            if (minActions.isEmpty() || cost(currentActions) < cost(minActions)) {
-                minActions.clear();
-                minActions.addAll(currentActions);
-                return;
+
+        List<Action> minForTarget = minForState.get(target);
+        final List<Context> filtered = new ArrayList<>();
+        for (Context context : newContexts) {
+            Cell position = context.state().position();
+            int direction = context.state().direction();
+            List<Action> actions = context.actions();
+            if (grid.get(position) == CellContent.WALL) {
+                continue;
             }
+            if (minForTarget != null && cost(actions) >= cost(minForTarget)) {
+                continue;
+            }
+            List<Action> minActionsState = minForState.get(context.state());
+            if (minActionsState == null || cost(actions) < cost(minActionsState)) {
+                minForState.put(context.state(), actions);
+            } else {
+                continue;
+            }
+            filtered.add(context);
+
         }
-        if (!minActions.isEmpty() && cost(currentActions) >= cost(minActions)) {
-            return;
-        }
-
-        Cell delta = DELTAS_CLOCKWISE.get(direction);
-        List<Action> straightActions = new ArrayList<>(currentActions);
-        straightActions.add(Action.MOVE_STRAIGHT);
-        findMinActions(minActions, target, new State(position.moveOf(delta), direction), straightActions, visited);
-
-        int clockwiseDirection = (direction + 1) % DELTAS_CLOCKWISE.size();
-        findMinActions(minActions, target, new State(position, clockwiseDirection), straightActions, visited);
-
-        int counterClockwiseDirection = (DELTAS_CLOCKWISE.size() + direction - 1) % DELTAS_CLOCKWISE.size();
-        findMinActions(minActions, target, new State(position, counterClockwiseDirection), straightActions, visited);
+        findMinActions(grid, target, filtered, minForState);
     }
 
     private static long cost(List<Action> actions) {
         return actions.stream().mapToLong(Action::cost).sum();
+    }
+
+    private record Context(State state, List<Action> actions) {
     }
 
     private record State(Cell position, int direction) {
