@@ -1,9 +1,10 @@
 package fr.ninauve.renaud.adventofcode.year2024.day16;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.IntStream;
 
 public class Part01 {
     private static final List<Cell> DELTAS_CLOCKWISE = List.of(
@@ -13,6 +14,12 @@ public class Part01 {
             ">", "v", "<", "^"
     );
 
+    public static void main(String... args) throws Exception {
+        final List<String> input = Files.readAllLines(Path.of(Part01.class
+                .getResource("/year2024/day16/input.txt").toURI()), StandardCharsets.UTF_8);
+        System.out.println(Part01.solve(input));
+    }
+
     public static List<String> toOutput(Grid grid, List<Action> actions) {
         final Map<Cell, String> trajectory = new HashMap<>();
         Cell position = grid.find(CellContent.START).getFirst();
@@ -21,9 +28,7 @@ public class Part01 {
             switch (action) {
                 case MOVE_STRAIGHT: {
                     Cell delta = DELTAS_CLOCKWISE.get(direction);
-                    String symbol = SYMBOLS_CLOCKWISE.get(direction);
                     position = position.moveOf(delta);
-                    trajectory.put(position, symbol);
                     break;
                 }
                 case TURN_CLOCKWISE: {
@@ -35,6 +40,8 @@ public class Part01 {
                     break;
                 }
             }
+            String symbol = SYMBOLS_CLOCKWISE.get(direction);
+            trajectory.put(position, symbol);
         }
         final List<String> lines = new ArrayList<>();
         for (int row = 0; row < grid.getNbRows(); row++) {
@@ -49,61 +56,68 @@ public class Part01 {
         return lines;
     }
 
+    public static long solve(List<String> input) {
+        List<Action> minActions = findMinActions(input);
+        return cost(minActions);
+    }
+
     public static List<Action> findMinActions(List<String> input) {
         Grid grid = Grid.fromInput(input);
         Cell start = grid.find(CellContent.START).getFirst();
         Cell exit = grid.find(CellContent.EXIT).getFirst();
-        int direction = 0;
         Map<State, List<Action>> minActions = new HashMap<>();
-        findMinActions(grid, exit, List.of(new Context(new State(start, direction), new ArrayList<>())), minActions);
-        return minActions.get(exit);
+        findMinActions(grid, start, exit, minActions);
+        return minForPosition(minActions, exit);
     }
 
-    private static void findMinActions(Grid grid, Cell target, List<Context> contexts, Map<State, List<Action>> minForState) {
-        final List<Context> newContexts = new ArrayList<>();
-        for (Context context : contexts) {
-            Cell position = context.state().position();
-            int direction = context.state().direction();
-            List<Action> actions = context.actions();
+    private static void findMinActions(Grid grid, Cell origin, Cell target, Map<State, List<Action>> minForState) {
+        Queue<Context> queue = new LinkedList<Context>();
+        queue.add(new Context(new State(origin, 0), List.of()));
+        Context current = null;
+        while ((current = queue.poll()) != null) {
+            Cell position = current.state().position();
+            int direction = current.state().direction();
+            List<Action> actions = current.actions();
+
+            List<Action> minActionsForTarget = minForPosition(minForState, target);
+            if (minActionsForTarget != null && cost(actions) >= cost(minActionsForTarget)) {
+                continue;
+            }
+
+            List<Action> minActionsForCurrent = minForState.get(current.state());
+            if (minActionsForCurrent == null || cost(actions) < cost(minActionsForCurrent)) {
+                minForState.put(current.state(), actions);
+            } else {
+                continue;
+            }
 
             Cell delta = DELTAS_CLOCKWISE.get(direction);
+            Cell straightPosition = position.moveOf(delta);
             List<Action> straightActions = new ArrayList<>(actions);
             straightActions.add(Action.MOVE_STRAIGHT);
-            newContexts.add(new Context(new State(position.moveOf(delta), direction), straightActions));
+            if (grid.isValid(straightPosition) && grid.get(straightPosition) != CellContent.WALL) {
+                queue.offer(new Context(new State(straightPosition, direction), straightActions));
+            }
 
             int clockDirection = (direction + 1) % DELTAS_CLOCKWISE.size();
             List<Action> clockActions = new ArrayList<>(actions);
-            straightActions.add(Action.TURN_CLOCKWISE);
-            newContexts.add(new Context(new State(position, clockDirection), clockActions));
+            clockActions.add(Action.TURN_CLOCKWISE);
+            queue.add(new Context(new State(position, clockDirection), clockActions));
 
             int counterClockDirection = (DELTAS_CLOCKWISE.size() + direction - 1) % DELTAS_CLOCKWISE.size();
             List<Action> counterClockActions = new ArrayList<>(actions);
             counterClockActions.add(Action.TURN_COUNTERCLOCKWISE);
-            newContexts.add(new Context(new State(position, counterClockDirection), counterClockActions));
+            queue.add(new Context(new State(position, counterClockDirection), counterClockActions));
         }
+    }
 
-        List<Action> minForTarget = minForState.get(target);
-        final List<Context> filtered = new ArrayList<>();
-        for (Context context : newContexts) {
-            Cell position = context.state().position();
-            int direction = context.state().direction();
-            List<Action> actions = context.actions();
-            if (grid.get(position) == CellContent.WALL) {
-                continue;
-            }
-            if (minForTarget != null && cost(actions) >= cost(minForTarget)) {
-                continue;
-            }
-            List<Action> minActionsState = minForState.get(context.state());
-            if (minActionsState == null || cost(actions) < cost(minActionsState)) {
-                minForState.put(context.state(), actions);
-            } else {
-                continue;
-            }
-            filtered.add(context);
-
-        }
-        findMinActions(grid, target, filtered, minForState);
+    private static List<Action> minForPosition(Map<State, List<Action>> minForState, Cell position) {
+        return IntStream.range(0, DELTAS_CLOCKWISE.size())
+                .mapToObj(direction -> minForState.get(new State(position, direction)))
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparing(Part01::cost))
+                .findFirst()
+                .orElse(null);
     }
 
     private static long cost(List<Action> actions) {
