@@ -4,6 +4,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Part01 {
@@ -57,20 +59,20 @@ public class Part01 {
     }
 
     public static long solve(List<String> input) {
-        List<Action> minActions = findMinActions(input);
+        List<Action> minActions = findMinActions(input).getFirst();
         return cost(minActions);
     }
 
-    public static List<Action> findMinActions(List<String> input) {
+    public static List<List<Action>> findMinActions(List<String> input) {
         Grid grid = Grid.fromInput(input);
         Cell start = grid.find(CellContent.START).getFirst();
         Cell exit = grid.find(CellContent.EXIT).getFirst();
-        Map<State, List<Action>> minActions = new HashMap<>();
+        Map<State, List<List<Action>>> minActions = new HashMap<>();
         findMinActions(grid, start, exit, minActions);
-        return minForPosition(minActions, exit);
+        return allMinForPosition(minActions, exit);
     }
 
-    private static void findMinActions(Grid grid, Cell origin, Cell target, Map<State, List<Action>> minForState) {
+    private static void findMinActions(Grid grid, Cell origin, Cell target, Map<State, List<List<Action>>> minForState) {
         Queue<Context> queue = new LinkedList<Context>();
         queue.add(new Context(new State(origin, 0), List.of()));
         Context current = null;
@@ -84,9 +86,13 @@ public class Part01 {
                 continue;
             }
 
-            List<Action> minActionsForCurrent = minForState.get(current.state());
-            if (minActionsForCurrent == null || cost(actions) < cost(minActionsForCurrent)) {
-                minForState.put(current.state(), actions);
+            List<List<Action>> minActionsForCurrent = minForState.get(current.state());
+            if (minActionsForCurrent == null || cost(actions) < cost(minActionsForCurrent.getFirst())) {
+                List<List<Action>> newMinActionsForSTate = new ArrayList<>();
+                newMinActionsForSTate.add(actions);
+                minForState.put(current.state(), newMinActionsForSTate);
+            } else if (cost(actions) == cost(minActionsForCurrent.getFirst())) {
+                minActionsForCurrent.add(actions);
             } else {
                 continue;
             }
@@ -111,13 +117,24 @@ public class Part01 {
         }
     }
 
-    private static List<Action> minForPosition(Map<State, List<Action>> minForState, Cell position) {
-        return IntStream.range(0, DELTAS_CLOCKWISE.size())
+    private static List<Action> minForPosition(Map<State, List<List<Action>>> minForState, Cell position) {
+        List<List<Action>> allMin = allMinForPosition(minForState, position);
+        if (allMin.isEmpty()) {
+            return null;
+        }
+        return allMin.getFirst();
+    }
+
+    private static List<List<Action>> allMinForPosition(Map<State, List<List<Action>>> minForState, Cell position) {
+        Map<Long, List<List<List<Action>>>> byCost = IntStream.range(0, DELTAS_CLOCKWISE.size())
                 .mapToObj(direction -> minForState.get(new State(position, direction)))
                 .filter(Objects::nonNull)
-                .sorted(Comparator.comparing(Part01::cost))
-                .findFirst()
-                .orElse(null);
+                .collect(Collectors.groupingBy(as -> cost(as.getFirst())));
+
+        return byCost.keySet().stream().mapToLong(Long::longValue)
+                .mapToObj(byCost::get)
+                .flatMap(allMin -> allMin.stream().flatMap(List::stream))
+                .toList();
     }
 
     private static long cost(List<Action> actions) {

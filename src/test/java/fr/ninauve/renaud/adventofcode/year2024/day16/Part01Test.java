@@ -69,7 +69,7 @@ class Part01Test {
                 "###############"
         );
         Grid grid = Grid.fromInput(input);
-        List<Action> actions = Part01.findMinActions(input);
+        List<Action> actions = Part01.findMinActions(input).getFirst();
 
         List<String> actual = Part01.toOutput(grid, actions);
 
@@ -114,9 +114,9 @@ class Part01Test {
                 "#################"
         );
         Grid grid = Grid.fromInput(input);
-        List<Action> actions = Part01.findMinActions(input);
+        List<List<Action>> actions = Part01.findMinActions(input);
 
-        List<String> actual = Part01.toOutput(grid, actions);
+        List<String> actual = Part01.toOutput(grid, actions.getFirst());
 
         assertThat(actual).containsExactly(
                 "#################",
