@@ -23,8 +23,23 @@ public class Part01 {
     }
 
     public static List<String> toOutput(Grid grid, List<Action> actions) {
+        Map<Cell, String> trajectory = trajectory(grid.find(CellContent.START).getFirst(), actions);
+        final List<String> lines = new ArrayList<>();
+        for (int row = 0; row < grid.getNbRows(); row++) {
+            final StringBuilder line = new StringBuilder();
+            for (int col = 0; col < grid.getNbCols(); col++) {
+                Cell cell = new Cell(row, col);
+                String symbol = trajectory.getOrDefault(cell, grid.get(cell).symbol());
+                line.append(symbol);
+            }
+            lines.add(line.toString());
+        }
+        return lines;
+    }
+
+    public static Map<Cell, String> trajectory(Cell start, List<Action> actions) {
         final Map<Cell, String> trajectory = new HashMap<>();
-        Cell position = grid.find(CellContent.START).getFirst();
+        Cell position = start;
         int direction = 0;
         for (Action action : actions) {
             switch (action) {
@@ -45,17 +60,7 @@ public class Part01 {
             String symbol = SYMBOLS_CLOCKWISE.get(direction);
             trajectory.put(position, symbol);
         }
-        final List<String> lines = new ArrayList<>();
-        for (int row = 0; row < grid.getNbRows(); row++) {
-            final StringBuilder line = new StringBuilder();
-            for (int col = 0; col < grid.getNbCols(); col++) {
-                Cell cell = new Cell(row, col);
-                String symbol = trajectory.getOrDefault(cell, grid.get(cell).symbol());
-                line.append(symbol);
-            }
-            lines.add(line.toString());
-        }
-        return lines;
+        return trajectory;
     }
 
     public static long solve(List<String> input) {
@@ -82,7 +87,7 @@ public class Part01 {
             List<Action> actions = current.actions();
 
             List<Action> minActionsForTarget = minForPosition(minForState, target);
-            if (minActionsForTarget != null && cost(actions) >= cost(minActionsForTarget)) {
+            if (minActionsForTarget != null && cost(actions) > cost(minActionsForTarget)) {
                 continue;
             }
 
@@ -132,6 +137,8 @@ public class Part01 {
                 .collect(Collectors.groupingBy(as -> cost(as.getFirst())));
 
         return byCost.keySet().stream().mapToLong(Long::longValue)
+                .min()
+                .stream()
                 .mapToObj(byCost::get)
                 .flatMap(allMin -> allMin.stream().flatMap(List::stream))
                 .toList();

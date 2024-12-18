@@ -16,9 +16,16 @@ public class Part02 {
     }
 
     public static long solve(List<String> input) {
-        return 0L;
-//        List<Action> minActions = Part01.findMinActions(input);
-//        return minActions.stream().filter(a -> a == Action.MOVE_STRAIGHT)
-//                .count();
+        List<List<Action>> minActions = Part01.findMinActions(input);
+
+        Grid grid = Grid.fromInput(input);
+        Cell start = grid.find(CellContent.START).getFirst();
+        List<Cell> minCells = minActions.stream()
+                .map(actions -> Part01.trajectory(start, actions))
+                .map(Map::keySet)
+                .flatMap(Set::stream)
+                .distinct()
+                .toList();
+        return minCells.size();
     }
 }
