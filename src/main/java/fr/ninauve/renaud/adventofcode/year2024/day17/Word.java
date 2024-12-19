@@ -3,6 +3,7 @@ package fr.ninauve.renaud.adventofcode.year2024.day17;
 import java.util.Comparator;
 
 public record Word(int value) implements Comparable<Word> {
+    private static final int MASK = 0b111;
 
     public static Word ZERO = new Word(0);
     public static Word ONE = new Word(1);
@@ -14,7 +15,7 @@ public record Word(int value) implements Comparable<Word> {
     public static Word SEVEN = new Word(7);
 
     public static Word valueOf(int value) {
-        return new Word(value);
+        return new Word(value & MASK);
     }
 
     public static Word valueOf(long value) {
@@ -32,5 +33,9 @@ public record Word(int value) implements Comparable<Word> {
 
     public long asLong() {
         return value;
+    }
+
+    public BigWord asBigWord() {
+        return BigWord.valueOf(asLong());
     }
 }

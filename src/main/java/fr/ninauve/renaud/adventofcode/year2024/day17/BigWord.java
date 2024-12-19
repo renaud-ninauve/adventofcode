@@ -29,6 +29,10 @@ public record BigWord(int value) {
         return value;
     }
 
+    public Word asWord() {
+        return Word.valueOf(asInt());
+    }
+
     @Override
     public String toString() {
         return Integer.toString(value);

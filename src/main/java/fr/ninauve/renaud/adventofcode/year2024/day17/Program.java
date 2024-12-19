@@ -1,8 +1,6 @@
 package fr.ninauve.renaud.adventofcode.year2024.day17;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public record Program(Map<Word, Word> values) {
     public static Program fromInputLine(String line) {
@@ -16,6 +14,15 @@ public record Program(Map<Word, Word> values) {
             values.put(address, value);
         }
         return new Program(Collections.unmodifiableMap(values));
+    }
+
+    public List<Word> asList() {
+        final List<Word> dataList = new ArrayList<>();
+        for(int i=0; i<values.size(); i++) {
+            Word address = Word.valueOf(i);
+            dataList.add(values.get(address));
+        }
+        return dataList;
     }
 
     public Word dataAt(Word address) {
