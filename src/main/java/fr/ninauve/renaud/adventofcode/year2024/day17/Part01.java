@@ -17,7 +17,7 @@ public class Part01 {
         while(!cpu.isHalt()) {
             Result result = cpu.execute();
             if (result.output().isPresent()) {
-                output.add(result.output().get());
+                output.add(result.output().get().toString());
             }
             cpu = result.cpu();
         }
