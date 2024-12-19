@@ -1,6 +1,7 @@
 package fr.ninauve.renaud.adventofcode.year2024.day17;
 
 public record BigWord(int value) {
+    public static final BigWord ZERO = new BigWord(0);
 
     public static BigWord valueOf(int value) {
         return new BigWord(value);

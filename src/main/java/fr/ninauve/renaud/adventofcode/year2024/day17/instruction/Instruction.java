@@ -13,6 +13,7 @@ public interface Instruction {
         instructions.put(Word.ZERO, new Adv());
         instructions.put(Word.ONE, new Bxl());
         instructions.put(Word.TWO, new Bst());
+        instructions.put(Word.THREE, new Jnz());
         Instruction instruction = instructions.get(opcode);
         if (instruction == null) {
             throw new IllegalArgumentException("unknown opcode " + opcode);
