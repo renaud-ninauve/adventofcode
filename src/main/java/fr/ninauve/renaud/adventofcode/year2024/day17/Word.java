@@ -17,6 +17,10 @@ public record Word(int value) implements Comparable<Word> {
         return new Word(value);
     }
 
+    public static Word valueOf(long value) {
+        return Word.valueOf((int) value);
+    }
+
     public Word increment() {
         return new Word(value + 1);
     }

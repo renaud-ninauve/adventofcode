@@ -12,6 +12,7 @@ public interface Instruction {
         Map<Word, Instruction> instructions = new HashMap<>();
         instructions.put(Word.ZERO, new Adv());
         instructions.put(Word.ONE, new Bxl());
+        instructions.put(Word.TWO, new Bst());
         Instruction instruction = instructions.get(opcode);
         if (instruction == null) {
             throw new IllegalArgumentException("unknown opcode " + opcode);
