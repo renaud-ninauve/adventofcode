@@ -23,4 +23,8 @@ public record BigWord(int value) {
     public long asLong() {
         return value;
     }
+
+    public int asInt() {
+        return value;
+    }
 }

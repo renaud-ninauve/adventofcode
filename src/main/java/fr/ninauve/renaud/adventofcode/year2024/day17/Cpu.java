@@ -28,6 +28,14 @@ public record Cpu(BigWord a, BigWord b, BigWord c, Word instructionPointer, Prog
         return new Cpu(data, b, c, instructionPointer, program);
     }
 
+    public Cpu registerB(BigWord data) {
+        return new Cpu(a, data, c, instructionPointer, program);
+    }
+
+    public Cpu registerC(BigWord data) {
+        return new Cpu(a, b, data, instructionPointer, program);
+    }
+
     public Cpu instructionPointer(Word newAddress) {
         return new Cpu(a, b, c, newAddress, program);
     }
