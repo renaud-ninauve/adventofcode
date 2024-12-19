@@ -16,6 +16,8 @@ public interface Instruction {
         instructions.put(Word.THREE, new Jnz());
         instructions.put(Word.FOUR, new Bxc());
         instructions.put(Word.FIVE, new Out());
+        instructions.put(Word.SIX, new Bdv());
+        instructions.put(Word.SEVEN, new Cdv());
         Instruction instruction = instructions.get(opcode);
         if (instruction == null) {
             throw new IllegalArgumentException("unknown opcode " + opcode);
