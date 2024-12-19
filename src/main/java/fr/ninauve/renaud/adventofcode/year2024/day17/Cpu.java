@@ -2,17 +2,36 @@ package fr.ninauve.renaud.adventofcode.year2024.day17;
 
 import java.util.List;
 
-public record Cpu(Register a, Register b, Register c, TriBit instructionPointer, Program program) {
+public record Cpu(BigWord a, BigWord b, BigWord c, Word instructionPointer, Program program) {
 
     public static Cpu fromInput(List<String> input) {
-        Register a = Register.fromInputLine(input.get(0));
-        Register b = Register.fromInputLine(input.get(1));
-        Register c = Register.fromInputLine(input.get(2));
+        BigWord a = BigWord.fromInputLine(input.get(0));
+        BigWord b = BigWord.fromInputLine(input.get(1));
+        BigWord c = BigWord.fromInputLine(input.get(2));
         Program program1 = Program.fromInputLine(input.get(4));
-        return new Cpu(a, b, c, new TriBit(0), program1);
+        return new Cpu(a, b, c, new Word(0), program1);
     }
 
-    public Cpu execute() {
-        return null;
+    public Result execute() {
+        Word opcode = program.dataAt(instructionPointer);
+        Instruction instruction = Instruction.forOpcode(opcode);
+        return instruction.execute(this);
+    }
+
+    public Word dataAt(Word address) {
+        return program.dataAt(address);
+    }
+
+    public Cpu registerA(BigWord data) {
+        return new Cpu(data, b, c, instructionPointer, program);
+    }
+
+    public Cpu instructionPointer(Word newAddress) {
+        return new Cpu(a, b, c, newAddress, program);
+    }
+
+    public Cpu incrementInstructionPointerBy2() {
+        Word newInstructionPointer = instructionPointer.increment().increment();
+        return new Cpu(a, b, c, newInstructionPointer, program);
     }
 }

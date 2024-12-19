@@ -19,17 +19,17 @@ class CpuTest {
                 "Program: 0,1,5,4,3,0"
         ));
 
-        assertThat(actual.a()).isEqualTo(new Register(729));
-        assertThat(actual.b()).isEqualTo(new Register(0));
-        assertThat(actual.c()).isEqualTo(new Register(0));
-        assertThat(actual.instructionPointer()).isEqualTo(new TriBit(0));
+        assertThat(actual.a()).isEqualTo(new BigWord(729));
+        assertThat(actual.b()).isEqualTo(new BigWord(0));
+        assertThat(actual.c()).isEqualTo(new BigWord(0));
+        assertThat(actual.instructionPointer()).isEqualTo(new Word(0));
         assertThat(actual.program().values()).containsExactlyInAnyOrderEntriesOf(Map.of(
-                new TriBit(0), new TriBit(0),
-                new TriBit(1), new TriBit(1),
-                new TriBit(2), new TriBit(5),
-                new TriBit(3), new TriBit(4),
-                new TriBit(4), new TriBit(3),
-                new TriBit(5), new TriBit(0)
+                new Word(0), new Word(0),
+                new Word(1), new Word(1),
+                new Word(2), new Word(5),
+                new Word(3), new Word(4),
+                new Word(4), new Word(3),
+                new Word(5), new Word(0)
         ));
     }
 }
