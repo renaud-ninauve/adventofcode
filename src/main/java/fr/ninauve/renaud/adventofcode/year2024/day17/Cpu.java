@@ -1,5 +1,7 @@
 package fr.ninauve.renaud.adventofcode.year2024.day17;
 
+import fr.ninauve.renaud.adventofcode.year2024.day17.instruction.Instruction;
+
 import java.util.List;
 
 public record Cpu(BigWord a, BigWord b, BigWord c, Word instructionPointer, Program program) {

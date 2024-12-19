@@ -1,4 +1,8 @@
-package fr.ninauve.renaud.adventofcode.year2024.day17;
+package fr.ninauve.renaud.adventofcode.year2024.day17.instruction;
+
+import fr.ninauve.renaud.adventofcode.year2024.day17.Cpu;
+import fr.ninauve.renaud.adventofcode.year2024.day17.Result;
+import fr.ninauve.renaud.adventofcode.year2024.day17.Word;
 
 import java.util.HashMap;
 import java.util.Map;

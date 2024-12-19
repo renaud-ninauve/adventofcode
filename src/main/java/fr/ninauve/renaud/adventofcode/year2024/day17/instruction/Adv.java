@@ -1,4 +1,6 @@
-package fr.ninauve.renaud.adventofcode.year2024.day17;
+package fr.ninauve.renaud.adventofcode.year2024.day17.instruction;
+
+import fr.ninauve.renaud.adventofcode.year2024.day17.*;
 
 public class Adv implements Instruction {
 
