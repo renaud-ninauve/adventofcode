@@ -44,4 +44,8 @@ public record Cpu(BigWord a, BigWord b, BigWord c, Word instructionPointer, Prog
         Word newInstructionPointer = instructionPointer.increment().increment();
         return new Cpu(a, b, c, newInstructionPointer, program);
     }
+
+    public boolean isHalt() {
+        return program.containsDataAt(instructionPointer);
+    }
 }

@@ -21,4 +21,8 @@ public record Program(Map<Word, Word> values) {
     public Word dataAt(Word address) {
         return values.getOrDefault(address, Word.ZERO);
     }
+
+    public boolean containsDataAt(Word address) {
+        return values.containsKey(address);
+    }
 }
