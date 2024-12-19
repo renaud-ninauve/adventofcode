@@ -46,6 +46,6 @@ public record Cpu(BigWord a, BigWord b, BigWord c, Word instructionPointer, Prog
     }
 
     public boolean isHalt() {
-        return program.containsDataAt(instructionPointer);
+        return !program.containsDataAt(instructionPointer);
     }
 }
