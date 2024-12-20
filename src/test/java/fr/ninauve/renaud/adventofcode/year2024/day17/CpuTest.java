@@ -22,14 +22,14 @@ class CpuTest {
         assertThat(actual.a()).isEqualTo(new BigWord(729));
         assertThat(actual.b()).isEqualTo(new BigWord(0));
         assertThat(actual.c()).isEqualTo(new BigWord(0));
-        assertThat(actual.instructionPointer()).isEqualTo(new Word(0));
+        assertThat(actual.instructionPointer()).isEqualTo(new Address(0));
         assertThat(actual.program().values()).containsExactlyInAnyOrderEntriesOf(Map.of(
-                new Word(0), new Word(0),
-                new Word(1), new Word(1),
-                new Word(2), new Word(5),
-                new Word(3), new Word(4),
-                new Word(4), new Word(3),
-                new Word(5), new Word(0)
+                new Address(0), new Word(0),
+                new Address(1), new Word(1),
+                new Address(2), new Word(5),
+                new Address(3), new Word(4),
+                new Address(4), new Word(3),
+                new Address(5), new Word(0)
         ));
     }
 }
