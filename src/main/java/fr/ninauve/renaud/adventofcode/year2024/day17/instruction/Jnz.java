@@ -9,6 +9,6 @@ public class Jnz implements Instruction {
             return Result.noOutputResult(cpu.incrementInstructionPointerBy2());
         }
         long operand = new Operand().litteral(cpu);
-        return Result.noOutputResult(cpu.instructionPointer(Word.valueOf(operand)));
+        return Result.noOutputResult(cpu.instructionPointer(Address.valueOf(operand)));
     }
 }

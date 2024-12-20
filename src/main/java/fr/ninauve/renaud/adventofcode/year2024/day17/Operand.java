@@ -24,8 +24,8 @@ public class Operand {
     }
 
     private Word litteralTribit(Cpu cpu) {
-        Word instructionPointer = cpu.instructionPointer();
-        Word operandAddress = instructionPointer.increment();
+        Address instructionPointer = cpu.instructionPointer();
+        Address operandAddress = instructionPointer.increment();
         return cpu.dataAt(operandAddress);
     }
 }

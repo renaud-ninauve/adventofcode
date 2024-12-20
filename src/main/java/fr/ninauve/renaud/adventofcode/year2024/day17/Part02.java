@@ -1,7 +1,5 @@
 package fr.ninauve.renaud.adventofcode.year2024.day17;
 
-import fr.ninauve.renaud.adventofcode.year2024.day16.Part01;
-
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,16 +11,33 @@ public class Part02 {
     public static void main(String... args) throws Exception {
         final List<String> input = Files.readAllLines(Path.of(Part02.class
                 .getResource("/year2024/day17/input.txt").toURI()), StandardCharsets.UTF_8);
-        long result = Part01.solve(input);
+        long result = Part02.solve(input);
         System.out.println(result);
     }
 
     public static int solve(List<String> input) {
         Cpu cpu = Cpu.fromInput(input);
+        List<String> print = cpu.print();
+        for (String line : print) {
+            System.out.println(line);
+        }
+        // 1245884033
         List<BigWord> program = cpu.program().asList().stream().map(Word::asBigWord).toList();
-        for(int a=0; a<Integer.MAX_VALUE; a++) {
-            List<BigWord> output = Part02.execute(cpu.registerA(BigWord.valueOf(a)));
-            if (output.equals(program)) {
+        int a = 0;
+        for (int i = 0; i < program.size(); i++) {
+            final BigWord data = program.get(i);
+            a = find(cpu, i, a, data);
+            System.out.println("[" + i + "] " + Integer.toOctalString(a));
+        }
+        return a;
+    }
+
+    private static int find(Cpu cpu, int index, int currentA, BigWord expected) {
+        for (int i = 0; i < 1000; i++) {
+            int a = Integer.rotateLeft(i, index * 3) + currentA;
+            Cpu newCpu = cpu.registerA(BigWord.valueOf(a));
+            List<BigWord> output = Part02.execute(newCpu);
+            if (output.size() > index && output.get(index).equals(expected)) {
                 return a;
             }
         }
@@ -40,4 +55,17 @@ public class Part02 {
         }
         return output;
     }
+
+//    Register A: 60589763
+//    Register B: 0
+//    Register C: 0
+//
+//    BST 4 => B = A % 8
+//    BXL 5 => B = B XOR 5       B = 1
+//    CDV 5 => C = A / 2^B       C = 0
+//    BXL 6 => B = B XOR 6       B = 6 + 2 = 4
+//    BXC 1 => B = B XOR C
+//    OUT 5 => PRINT B            B = 4
+//    ADV 3 => A + A / 2^3
+//    JNZ 0 => JUMP if A != 0
 }

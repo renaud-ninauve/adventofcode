@@ -23,7 +23,7 @@ public record Word(int value) implements Comparable<Word> {
     }
 
     public Word increment() {
-        return new Word(value + 1);
+        return Word.valueOf(value + 1);
     }
 
     @Override
@@ -37,5 +37,10 @@ public record Word(int value) implements Comparable<Word> {
 
     public BigWord asBigWord() {
         return BigWord.valueOf(asLong());
+    }
+
+    @Override
+    public String toString() {
+        return Integer.toString(value);
     }
 }
