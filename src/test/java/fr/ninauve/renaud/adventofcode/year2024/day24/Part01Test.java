@@ -100,14 +100,14 @@ class Part01Test {
 
     @Test
     void solve() {
-        int actual = Part01.solve(SIMPLE_EXAMPLE);
+        long actual = Part01.solve(SIMPLE_EXAMPLE);
 
         assertThat(actual).isEqualTo(4);
     }
 
     @Test
     void solveLarger() {
-        int actual = Part01.solve(LARGER_EXAMPLE);
+        long actual = Part01.solve(LARGER_EXAMPLE);
 
         assertThat(actual).isEqualTo(2024);
     }
