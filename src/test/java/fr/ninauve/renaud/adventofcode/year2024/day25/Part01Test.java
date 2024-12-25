@@ -63,4 +63,11 @@ class Part01Test {
                 List.of(3,0,2,0,1)
         );
     }
+
+    @Test
+    void solve() {
+        long actual = Part01.solve(SIMPLE_EXAMPLE);
+
+        assertThat(actual).isEqualTo(3L);
+    }
 }
