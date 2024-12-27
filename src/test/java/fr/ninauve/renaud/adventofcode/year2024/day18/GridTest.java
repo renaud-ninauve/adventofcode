@@ -7,6 +7,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class GridTest {
+    public static final String PATH_SYMBOL = "O";
     public static final int SIMPLE_NB_ROWS = 7;
     public static final int SIMPLE_NB_COLS = 7;
     public static final int SIMPLE_TIME = 12;
@@ -51,6 +52,31 @@ class GridTest {
                 "..#..#.",
                 ".#..#..",
                 "#.#...."
+        );
+    }
+
+    @Test
+    void toOutput() {
+        Grid grid = Grid.fromInput(SIMPLE_EXAMPLE.subList(0, SIMPLE_TIME), SIMPLE_NB_ROWS, SIMPLE_NB_COLS);
+        Cells cells = Cells.fromInput(List.of(
+                "OO.#OOO",
+                ".O#OO#O",
+                ".OOO#OO",
+                "...#OO#",
+                "..#OO#.",
+                ".#.O#..",
+                "#.#OOOO"
+        ), SIMPLE_NB_ROWS, SIMPLE_NB_COLS, PATH_SYMBOL);
+
+        List<String> actual = grid.toOutput(cells, PATH_SYMBOL);
+        assertThat(actual).containsExactly(
+                "OO.#OOO",
+                ".O#OO#O",
+                ".OOO#OO",
+                "...#OO#",
+                "..#OO#.",
+                ".#.O#..",
+                "#.#OOOO"
         );
     }
 }

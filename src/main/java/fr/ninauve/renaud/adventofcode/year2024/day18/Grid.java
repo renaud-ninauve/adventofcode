@@ -2,10 +2,7 @@ package fr.ninauve.renaud.adventofcode.year2024.day18;
 
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -24,13 +21,23 @@ public class Grid {
     }
 
     public List<String> toOutput() {
+        return toOutput(new Cells(Set.of()), null);
+    }
+
+    public List<String> toOutput(Cells cells, String symbol) {
         final List<String> output = new ArrayList<>();
         for (int row = 0; row < nbRows; row++) {
             final StringBuilder line = new StringBuilder();
             for (int col = 0; col < nbCols; col++) {
                 Cell cell = new Cell(row, col);
-                CellContent content = get(cell);
-                line.append(content.symbol());
+                final String outputSymbol;
+                if (cells.contains(cell)) {
+                    outputSymbol = symbol;
+                } else {
+                    CellContent content = get(cell);
+                    outputSymbol = content.symbol();
+                }
+                line.append(outputSymbol);
             }
             output.add(line.toString());
         }
