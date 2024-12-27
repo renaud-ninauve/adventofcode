@@ -38,10 +38,20 @@ class GridTest {
             "1,6",
             "2,0"
     );
+    public static final List<String> SIMPLE_EXAMPLE_01 = SIMPLE_EXAMPLE.subList(0, SIMPLE_TIME);
+    public static final List<String> SIMPLE_PATH = List.of(
+            "OO.#OOO",
+            ".O#OO#O",
+            ".OOO#OO",
+            "...#OO#",
+            "..#OO#.",
+            ".#.O#..",
+            "#.#OOOO"
+    );
 
     @Test
     void fromInput() {
-        Grid grid = Grid.fromInput(SIMPLE_EXAMPLE.subList(0, SIMPLE_TIME), SIMPLE_NB_ROWS, SIMPLE_NB_COLS);
+        Grid grid = Grid.fromInput(SIMPLE_EXAMPLE_01, SIMPLE_NB_ROWS, SIMPLE_NB_COLS);
 
         List<String> actual = grid.toOutput();
         assertThat(actual).containsExactly(
@@ -57,26 +67,10 @@ class GridTest {
 
     @Test
     void toOutput() {
-        Grid grid = Grid.fromInput(SIMPLE_EXAMPLE.subList(0, SIMPLE_TIME), SIMPLE_NB_ROWS, SIMPLE_NB_COLS);
-        Cells cells = Cells.fromInput(List.of(
-                "OO.#OOO",
-                ".O#OO#O",
-                ".OOO#OO",
-                "...#OO#",
-                "..#OO#.",
-                ".#.O#..",
-                "#.#OOOO"
-        ), SIMPLE_NB_ROWS, SIMPLE_NB_COLS, PATH_SYMBOL);
+        Grid grid = Grid.fromInput(SIMPLE_EXAMPLE_01, SIMPLE_NB_ROWS, SIMPLE_NB_COLS);
+        Cells cells = Cells.fromInput(SIMPLE_PATH, SIMPLE_NB_ROWS, SIMPLE_NB_COLS, PATH_SYMBOL);
 
         List<String> actual = grid.toOutput(cells, PATH_SYMBOL);
-        assertThat(actual).containsExactly(
-                "OO.#OOO",
-                ".O#OO#O",
-                ".OOO#OO",
-                "...#OO#",
-                "..#OO#.",
-                ".#.O#..",
-                "#.#OOOO"
-        );
+        assertThat(actual).containsExactlyElementsOf(SIMPLE_PATH);
     }
 }
