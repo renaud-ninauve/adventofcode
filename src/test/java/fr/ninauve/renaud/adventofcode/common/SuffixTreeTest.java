@@ -9,6 +9,47 @@ class SuffixTreeTest {
     static final String ENDING_LABEL = "" + SuffixTree.ENDING_CHAR;
 
     @Test
+    void print() {
+        // aab
+        SuffixTree.Node root = rootNode();
+
+        // ending -> 3
+        root.append(ENDING_LABEL, leafNode(3));
+
+        // b -> 2
+        SuffixTree.Node b = intermediateNode();
+        root.append("b", b);
+        b.append(ENDING_LABEL, leafNode(2));
+
+        // ab -> 1
+        SuffixTree.Node a = intermediateNode();
+        root.append("a", a);
+        SuffixTree.Node a_b = intermediateNode();
+        a.append("b", a_b);
+        a_b.append(ENDING_LABEL, leafNode(1));
+
+        // aab -> 0
+        SuffixTree.Node a_a = intermediateNode();
+        a.append("a", a_a);
+        SuffixTree.Node a_a_b = intermediateNode();
+        a_a.append("b", a_a_b);
+        a_a_b.append(ENDING_LABEL, leafNode(0));
+
+        SuffixTree suffixTree = new SuffixTree(SuffixTree.ENDING_CHAR, root);
+        assertThat(suffixTree.print()).isEqualTo("""                
+                a
+                ..a
+                ....b
+                ......$0
+                ..b
+                ....$1
+                b
+                ..$2
+                $3
+                """);
+    }
+
+    @Test
     void from_empty() {
         SuffixTree actual = SuffixTree.from("");
 
