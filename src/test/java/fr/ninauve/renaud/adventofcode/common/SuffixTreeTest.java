@@ -64,4 +64,29 @@ class SuffixTreeTest {
                 root
         ));
     }
+
+    @Test
+    void from_2_same_chars() {
+        SuffixTree actual = SuffixTree.from("aa");
+
+        SuffixTree.Node root = rootNode();
+
+        // ending -> 2
+        root.append(ENDING_LABEL, leafNode(2));
+
+        // a -> 1
+        SuffixTree.Node a = intermediateNode();
+        root.append("a", a);
+        a.append(ENDING_LABEL, leafNode(1));
+
+        // aa -> 0
+        SuffixTree.Node a_a = intermediateNode();
+        a.append("a", a_a);
+        a_a.append(ENDING_LABEL, leafNode(0));
+
+        assertThat(actual).isEqualTo(new SuffixTree(
+                SuffixTree.ENDING_CHAR,
+                root
+        ));
+    }
 }
