@@ -50,7 +50,7 @@ class SuffixTreeTest {
     }
 
     @Test
-    void from_empty() {
+    void expanded_empty() {
         SuffixTree actual = SuffixTree.expandedTree("");
 
         assertThat(actual.print()).isEqualTo("""
@@ -59,7 +59,7 @@ class SuffixTreeTest {
     }
 
     @Test
-    void from_one_char() {
+    void expanded_one_char() {
         SuffixTree actual = SuffixTree.expandedTree("a");
 
         assertThat(actual.print()).isEqualTo("""
@@ -70,7 +70,7 @@ class SuffixTreeTest {
     }
 
     @Test
-    void from_2_different_chars() {
+    void expanded_2_different_chars() {
         SuffixTree actual = SuffixTree.expandedTree("ab");
 
         assertThat(actual.print()).isEqualTo("""
@@ -84,7 +84,7 @@ class SuffixTreeTest {
     }
 
     @Test
-    void from_2_same_chars() {
+    void expanded_2_same_chars() {
         SuffixTree actual = SuffixTree.expandedTree("aa");
 
         assertThat(actual.print()).isEqualTo("""
@@ -93,6 +93,44 @@ class SuffixTreeTest {
                 ....$0
                 ..$1
                 $2
+                """);
+    }
+
+    @Test
+    void expanded_bananas() {
+        SuffixTree actual = SuffixTree.expandedTree("bananas");
+
+        assertThat(actual.print()).isEqualTo("""
+                a
+                ..n
+                ....a
+                ......n
+                ........a
+                ..........s
+                ............$1
+                ......s
+                ........$3
+                ..s
+                ....$5
+                b
+                ..a
+                ....n
+                ......a
+                ........n
+                ..........a
+                ............s
+                ..............$0
+                n
+                ..a
+                ....n
+                ......a
+                ........s
+                ..........$2
+                ....s
+                ......$4
+                s
+                ..$6
+                $7
                 """);
     }
 }
