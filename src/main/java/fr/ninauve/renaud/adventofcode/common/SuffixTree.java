@@ -14,8 +14,21 @@ public class SuffixTree {
     private final Node root;
 
     public static SuffixTree from(String str) {
+        String strWithEnding = str + ENDING_CHAR;
         Node root = Node.root();
-        root.append("" + ENDING_CHAR, Node.leaf(0));
+        for (int s = strWithEnding.length() - 1; s >= 0; s--) {
+            Node currentNode = root;
+            for (int c = s; c < strWithEnding.length(); c++) {
+                char currentChar = strWithEnding.charAt(c);
+                String currentLabel = "" + currentChar;
+                Node newNode = currentNode.childByLabel(currentLabel);
+                if (newNode == null) {
+                    newNode = Node.leaf(c);
+                }
+                currentNode.append(currentLabel, newNode);
+                currentNode = newNode;
+            }
+        }
         return new SuffixTree(ENDING_CHAR, root);
     }
 
@@ -44,6 +57,10 @@ public class SuffixTree {
 
         public void append(String label, Node child) {
             children.put(label, child);
+        }
+
+        public Node childByLabel(String label) {
+            return children.get(label);
         }
     }
 }
