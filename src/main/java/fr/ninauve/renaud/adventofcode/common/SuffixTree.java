@@ -19,6 +19,10 @@ public class SuffixTree {
     private final Node root;
 
     public static SuffixTree from(String str) {
+        return expandedTree(str);
+    }
+
+    static SuffixTree expandedTree(String str) {
         String strWithEnding = str + ENDING_CHAR;
         Node root = Node.rootNode();
         for (int s = strWithEnding.length() - 1; s >= 0; s--) {

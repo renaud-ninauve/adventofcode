@@ -51,7 +51,7 @@ class SuffixTreeTest {
 
     @Test
     void from_empty() {
-        SuffixTree actual = SuffixTree.from("");
+        SuffixTree actual = SuffixTree.expandedTree("");
 
         assertThat(actual.print()).isEqualTo("""
                 $0
@@ -60,7 +60,7 @@ class SuffixTreeTest {
 
     @Test
     void from_one_char() {
-        SuffixTree actual = SuffixTree.from("a");
+        SuffixTree actual = SuffixTree.expandedTree("a");
 
         assertThat(actual.print()).isEqualTo("""
                 a
@@ -71,7 +71,7 @@ class SuffixTreeTest {
 
     @Test
     void from_2_different_chars() {
-        SuffixTree actual = SuffixTree.from("ab");
+        SuffixTree actual = SuffixTree.expandedTree("ab");
 
         assertThat(actual.print()).isEqualTo("""
                 a
@@ -85,7 +85,7 @@ class SuffixTreeTest {
 
     @Test
     void from_2_same_chars() {
-        SuffixTree actual = SuffixTree.from("aa");
+        SuffixTree actual = SuffixTree.expandedTree("aa");
 
         assertThat(actual.print()).isEqualTo("""
                 a
