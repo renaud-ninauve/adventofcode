@@ -133,4 +133,23 @@ class SuffixTreeTest {
                 $7
                 """);
     }
+
+    @Test
+    void from_bananas() {
+        SuffixTree actual = SuffixTree.from("bananas");
+
+        assertThat(actual.print()).isEqualTo("""
+                a
+                ..na
+                ....nas$1
+                ....s$3
+                ..s$5
+                bananas$0
+                na
+                ..nas$2
+                ..s$4
+                s$6
+                $7
+                """);
+    }
 }
