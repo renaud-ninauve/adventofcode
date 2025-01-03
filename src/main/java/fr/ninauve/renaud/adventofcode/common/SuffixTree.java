@@ -15,34 +15,23 @@ public class SuffixTree {
     private static final Comparator<String> LABEL_COMPARATOR = Comparator.<String, Integer>comparing(str -> ENDING_LABEL.equals(str) ? 1 : 0)
             .thenComparing(Function.identity());
 
-    private final char endingChar;
     private final Node root;
 
     public static SuffixTree from(String str) {
-        return expandedTree(str);
-    }
-
-    static SuffixTree expandedTree(String str) {
-        String strWithEnding = str + ENDING_CHAR;
-        Node root = Node.rootNode();
-        for (int s = strWithEnding.length() - 1; s >= 0; s--) {
-            Node currentNode = root;
-            for (int c = s; c < strWithEnding.length(); c++) {
-                char currentChar = strWithEnding.charAt(c);
-                String currentLabel = "" + currentChar;
-                Node newNode = currentNode.childByLabel(currentLabel);
-                if (newNode == null) {
-                    newNode = Node.leafNode(s);
-                }
-                currentNode.append(currentLabel, newNode);
-                currentNode = newNode;
-            }
+        if (str == null || str.isEmpty()) {
+            return new SuffixTree(Node.rootNode());
         }
-        return new SuffixTree(ENDING_CHAR, root);
+        Node root = Node.rootNode();
+        Node leaf = Node.leafNode(1);
+        root.append(str.substring(0, 1), leaf);
+        SuffixTree suffixTree = new SuffixTree(root);
+        for(int i=1; i<str.length(); i++) {
+            suffixTree.appendCharAt(str, i);
+        }
+        return suffixTree;
     }
 
-    public SuffixTree(char endingChar, Node root) {
-        this.endingChar = endingChar;
+    public SuffixTree(Node root) {
         this.root = root;
     }
 
@@ -53,13 +42,46 @@ public class SuffixTree {
         return output.stream().collect(Collectors.joining(System.lineSeparator()));
     }
 
+    private void appendCharAt(String str, int index) {
+        for(int previousPhaseIndex=0; previousPhaseIndex<=index; previousPhaseIndex++) {
+            String previousLabel = str.substring(previousPhaseIndex, index);
+            FindEndNodeResult previousEndNode = findEndOfPath(previousLabel);
+            //extend();
+        }
+    }
+
+    public FindEndNodeResult findEndOfPath(String str) {
+        Node current = root;
+        int index = 0;
+        FindEndNodeResult result = null;
+        while(index < str.length()) {
+            final String toMatch = str.substring(index);
+            Map.Entry<String, Node> labelAndNode = current.children.entrySet().stream()
+                    .filter(e -> {
+                        String label = e.getKey();
+                        if (label.length() <= toMatch.length()) {
+                            return toMatch.startsWith(label);
+                        }
+                        return label.startsWith(toMatch);
+                    }).findFirst()
+                    .orElse(null);
+            if (labelAndNode == null) {
+                return null;
+            }
+            index += labelAndNode.getKey().length();
+            result = new FindEndNodeResult(labelAndNode.getValue(), current, labelAndNode.getKey());
+            current = labelAndNode.getValue();
+        }
+        return result;
+    }
+
     private void print(List<String> result, Node currentNode, int level) {
         for (Map.Entry<String, Node> entry : currentNode.children.entrySet()) {
             String childLabel = entry.getKey();
             Node child = entry.getValue();
             String indent = ".".repeat(2 * level);
             if (child.isLeaf()) {
-                result.add(indent + childLabel + child.index);
+                result.add(indent + childLabel + child.position);
             } else {
                 result.add(indent + childLabel);
                 print(result, child, level + 1);
@@ -70,7 +92,7 @@ public class SuffixTree {
     @Data
     @AllArgsConstructor
     public static class Node {
-        private int index;
+        private int position;
         private TreeMap<String, Node> children;
 
         public static Node rootNode() {
@@ -81,12 +103,12 @@ public class SuffixTree {
             return rootNode();
         }
 
-        public static Node leafNode(int index) {
-            return new Node(index, new TreeMap<>(LABEL_COMPARATOR));
+        public static Node leafNode(int position) {
+            return new Node(position, new TreeMap<>(LABEL_COMPARATOR));
         }
 
         public void append(String label, Node child) {
-            this.index = -1;
+            this.position = -1;
             children.put(label, child);
         }
 
@@ -98,4 +120,6 @@ public class SuffixTree {
             return children.isEmpty();
         }
     }
+
+    private record FindEndNodeResult(Node node, Node parent, String label) {}
 }

@@ -1,12 +1,78 @@
 package fr.ninauve.renaud.adventofcode.common;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 import static fr.ninauve.renaud.adventofcode.common.SuffixTree.Node.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SuffixTreeTest {
     static final String ENDING_LABEL = "" + SuffixTree.ENDING_CHAR;
+    static final String PRINT_BANANAS = """
+            a
+            ..na
+            ....nas$1
+            ....s$3
+            ..s$5
+            bananas$0
+            na
+            ..nas$2
+            ..s$4
+            s$6
+            $7
+            """;
+
+    static final SuffixTree BANANAS;
+
+    static {
+        SuffixTree.Node root = rootNode();
+
+        // a
+        SuffixTree.Node a = intermediateNode();
+        root.append("a", a);
+
+        // a_na
+        SuffixTree.Node a_na = intermediateNode();
+        a.append("na", a_na);
+
+        SuffixTree.Node a_na_nas = leafNode(1);
+        a_na.append("nas$", a_na_nas);
+
+        SuffixTree.Node a_na_s = leafNode(3);
+        a_na.append("s$", a_na_s);
+
+        // a_s
+        SuffixTree.Node a_s = leafNode(5);
+        a.append("s$", a_s);
+
+        // bananas
+        SuffixTree.Node bananas = leafNode(0);
+        root.append("bananas$", bananas);
+
+        // na
+        SuffixTree.Node na = intermediateNode();
+        root.append("na", na);
+
+        SuffixTree.Node na_nas = leafNode(2);
+        na.append("nas$", na_nas);
+
+        SuffixTree.Node na_s = leafNode(4);
+        na.append("s$", na_s);
+
+        // s
+        SuffixTree.Node s = leafNode(6);
+        root.append("s$", s);
+
+        // $
+        SuffixTree.Node end = leafNode(7);
+        root.append("$", end);
+
+        BANANAS = new SuffixTree(root);
+    }
 
     @Test
     void print() {
@@ -35,7 +101,7 @@ class SuffixTreeTest {
         a_a.append("b", a_a_b);
         a_a_b.append(ENDING_LABEL, leafNode(0));
 
-        SuffixTree suffixTree = new SuffixTree(SuffixTree.ENDING_CHAR, root);
+        SuffixTree suffixTree = new SuffixTree(root);
         assertThat(suffixTree.print()).isEqualTo("""                
                 a
                 ..a
@@ -49,107 +115,43 @@ class SuffixTreeTest {
                 """);
     }
 
-    @Test
-    void expanded_empty() {
-        SuffixTree actual = SuffixTree.expandedTree("");
+    static Stream<Arguments> from() {
+        return Stream.of(
+                Arguments.of(
+                        "",
+                        ""
+                ),
+                Arguments.of(
+                        "b",
+                        """
+                                b1
+                                """
+                ),
+                Arguments.of(
+                        "ba",
+                        """
+                                a2
+                                ..ba1
+                                """
+                ),
+                Arguments.of(
+                        "bananas$",
+                        PRINT_BANANAS
+                )
+        );
+    }
 
-        assertThat(actual.print()).isEqualTo("""
-                $0
-                """);
+    @ParameterizedTest(name = "from({0})")
+    @MethodSource
+    void from(String str, String expected) {
+        SuffixTree actual = SuffixTree.from(str);
+
+        assertThat(actual.print()).isEqualTo(expected);
     }
 
     @Test
-    void expanded_one_char() {
-        SuffixTree actual = SuffixTree.expandedTree("a");
-
-        assertThat(actual.print()).isEqualTo("""
-                a
-                ..$0
-                $1
-                """);
-    }
-
-    @Test
-    void expanded_2_different_chars() {
-        SuffixTree actual = SuffixTree.expandedTree("ab");
-
-        assertThat(actual.print()).isEqualTo("""
-                a
-                ..b
-                ....$0
-                b
-                ..$1
-                $2
-                """);
-    }
-
-    @Test
-    void expanded_2_same_chars() {
-        SuffixTree actual = SuffixTree.expandedTree("aa");
-
-        assertThat(actual.print()).isEqualTo("""
-                a
-                ..a
-                ....$0
-                ..$1
-                $2
-                """);
-    }
-
-    @Test
-    void expanded_bananas() {
-        SuffixTree actual = SuffixTree.expandedTree("bananas");
-
-        assertThat(actual.print()).isEqualTo("""
-                a
-                ..n
-                ....a
-                ......n
-                ........a
-                ..........s
-                ............$1
-                ......s
-                ........$3
-                ..s
-                ....$5
-                b
-                ..a
-                ....n
-                ......a
-                ........n
-                ..........a
-                ............s
-                ..............$0
-                n
-                ..a
-                ....n
-                ......a
-                ........s
-                ..........$2
-                ....s
-                ......$4
-                s
-                ..$6
-                $7
-                """);
-    }
-
-    @Test
-    void from_bananas() {
-        SuffixTree actual = SuffixTree.from("bananas");
-
-        assertThat(actual.print()).isEqualTo("""
-                a
-                ..na
-                ....nas$1
-                ....s$3
-                ..s$5
-                bananas$0
-                na
-                ..nas$2
-                ..s$4
-                s$6
-                $7
-                """);
+    void pringBananas() {
+        String actual = BANANAS.print();
+        assertThat(actual).isEqualTo(PRINT_BANANAS);
     }
 }
