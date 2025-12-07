@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Part01 {
@@ -16,10 +17,8 @@ public class Part01 {
   public static long solve(List<String> input) {
     List<Problem> problems = parse(input);
     return problems.stream()
-        .mapToLong(p -> -p.operands().stream()
-            .mapToLong(Long::longValue)
-            .reduce(p.operator().identity(), p.operator().operation()))
-        .sum() * -1;
+        .mapToLong(Problem::compute)
+        .sum();
   }
 
   public static List<Problem> parse(List<String> input) {
@@ -56,11 +55,10 @@ public class Part01 {
   }
 
   private static List<Operator> parseOperators(String line) {
-    List<Operator> operators = new ArrayList<>();
-    Scanner scanner = new Scanner(line);
-    while (scanner.hasNext()) {
-      operators.add(Operator.parse(scanner.next()));
-    }
-    return operators;
+    return line.chars()
+        .mapToObj(i -> (char) i)
+        .map(Operator::parse)
+        .flatMap(Optional::stream)
+        .toList();
   }
 }
