@@ -1,4 +1,4 @@
-package fr.ninauve.renaud.adventofcode.year2025.day07;
+package fr.ninauve.renaud.adventofcode.year2025.day06;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class Part01 {
 
   public static void main(String... args) throws Exception {
-    List<String> input = Files.readAllLines(Path.of(Part01.class.getResource("/year2025/day07/input.txt").toURI()));
+    List<String> input = Files.readAllLines(Path.of(Part01.class.getResource("/year2025/day06/input.txt").toURI()));
     System.out.println(Part01.solve(input));
   }
 

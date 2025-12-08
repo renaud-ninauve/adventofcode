@@ -1,4 +1,4 @@
-package fr.ninauve.renaud.adventofcode.year2025.day07;
+package fr.ninauve.renaud.adventofcode.year2025.day06;
 
 import java.util.Arrays;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package fr.ninauve.renaud.adventofcode.year2025.day07;
+package fr.ninauve.renaud.adventofcode.year2025.day06;
 
 import org.junit.jupiter.api.Test;
 
@@ -6,7 +6,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class Part01Test {
+class Part02Test {
   private static final List<String> INPUT = """
       123 328  51 64\s
        45 64  387 23\s
@@ -16,6 +16,6 @@ class Part01Test {
 
   @Test
   void should_solve() {
-    assertThat(Part01.solve(INPUT)).isEqualTo(4277556L);
+    assertThat(Part02.solve(INPUT)).isEqualTo(3263827L);
   }
 }
