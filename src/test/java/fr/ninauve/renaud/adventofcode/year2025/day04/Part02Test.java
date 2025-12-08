@@ -1,4 +1,4 @@
-package fr.ninauve.renaud.adventofcode.year2025.day05;
+package fr.ninauve.renaud.adventofcode.year2025.day04;
 
 import org.junit.jupiter.api.Test;
 
