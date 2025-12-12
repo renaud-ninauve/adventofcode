@@ -1,6 +1,8 @@
 package fr.ninauve.renaud.adventofcode.year2025.day09;
 
 import java.util.Comparator;
+import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 public record Rectangle(Point a, Point b) {
@@ -22,6 +24,20 @@ public record Rectangle(Point a, Point b) {
 
   public long area() {
     return width() * height();
+  }
+
+  public List<Point> corners() {
+    Col minCol = Stream.of(a, b).map(Point::col).min(Comparator.comparing(Function.identity())).get();
+    Col maxCol = Stream.of(a, b).map(Point::col).max(Comparator.comparing(Function.identity())).get();
+    Row minRow = Stream.of(a, b).map(Point::row).min(Comparator.comparing(Function.identity())).get();
+    Row maxRow = Stream.of(a, b).map(Point::row).max(Comparator.comparing(Function.identity())).get();
+
+    return List.of(
+        new Point(minCol, minRow),
+        new Point(minCol, minRow),
+        new Point(minCol, minRow),
+        new Point(minCol, minRow)
+    );
   }
 
   private long distance(long a, long b) {
