@@ -36,7 +36,7 @@ class Part01Test {
             "mul(12)",
             "mul(1234,1)",
             "mul(1,1234)",
-            "mul(a,b)"
+            "mul(corner1,corner2)"
     })
     void parse_invalid(String str) {
         Matcher matcher = Part01.MULTIPLY_PATTERN.matcher(str);

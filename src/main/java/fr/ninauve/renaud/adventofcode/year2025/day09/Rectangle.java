@@ -1,48 +1,46 @@
 package fr.ninauve.renaud.adventofcode.year2025.day09;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
-public record Rectangle(Point a, Point b) {
-  public Rectangle(Point a, Point b) {
-    Comparator<Point> comparator = Comparator.comparing(Point::row).thenComparing(Point::col);
-    Point min = Stream.of(a, b).min(comparator).get();
-    Point max = Stream.of(a, b).max(comparator).get();
-    this.a = min;
-    this.b = max;
-  }
+import static java.util.Comparator.naturalOrder;
 
-  public long width() {
-    return distance(a.col().value(), b.col().value()) + 1;
-  }
+public record Rectangle(Point corner1, Point corner2) {
+    public Rectangle(Point corner1, Point corner2) {
+        Col minCol = Stream.of(corner1, corner2).map(Point::col).min(naturalOrder()).get();
+        Col maxCol = Stream.of(corner1, corner2).map(Point::col).max(naturalOrder()).get();
+        Row minRow = Stream.of(corner1, corner2).map(Point::row).min(naturalOrder()).get();
+        Row maxRow = Stream.of(corner1, corner2).map(Point::row).max(naturalOrder()).get();
+        this.corner1 = new Point(minRow, minCol);
+        this.corner2 = new Point(maxRow, maxCol);
+    }
 
-  public long height() {
-    return distance(a.row().value(), b.row().value()) + 1;
-  }
+    public long width() {
+        return distance(corner1.col().value(), corner2.col().value()) + 1;
+    }
 
-  public long area() {
-    return width() * height();
-  }
+    public long height() {
+        return distance(corner1.row().value(), corner2.row().value()) + 1;
+    }
 
-  public List<Point> corners() {
-    Col minCol = Stream.of(a, b).map(Point::col).min(Comparator.comparing(Function.identity())).get();
-    Col maxCol = Stream.of(a, b).map(Point::col).max(Comparator.comparing(Function.identity())).get();
-    Row minRow = Stream.of(a, b).map(Point::row).min(Comparator.comparing(Function.identity())).get();
-    Row maxRow = Stream.of(a, b).map(Point::row).max(Comparator.comparing(Function.identity())).get();
+    public long area() {
+        return width() * height();
+    }
 
-    return List.of(
-        new Point(minCol, minRow),
-        new Point(minCol, minRow),
-        new Point(minCol, minRow),
-        new Point(minCol, minRow)
-    );
-  }
+    public Point topLeft() {
+        Col minCol = Stream.of(corner1, corner2).map(Point::col).min(naturalOrder()).get();
+        Row minRow = Stream.of(corner1, corner2).map(Point::row).min(naturalOrder()).get();
+        return new Point(minRow, minCol);
+    }
 
-  private long distance(long a, long b) {
-    long max = Math.max(a, b);
-    long min = Math.min(a, b);
-    return max - min;
-  }
+    public Point bottomRight() {
+        Col maxCol = Stream.of(corner1, corner2).map(Point::col).max(naturalOrder()).get();
+        Row maxRow = Stream.of(corner1, corner2).map(Point::row).max(naturalOrder()).get();
+        return new Point(maxRow, maxCol);
+    }
+
+    private long distance(long a, long b) {
+        long max = Math.max(a, b);
+        long min = Math.min(a, b);
+        return max - min;
+    }
 }
