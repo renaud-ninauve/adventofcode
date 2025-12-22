@@ -20,4 +20,18 @@ public record Button(int index, List<Integer> lightIndexes) {
                 ? toggle(light)
                 : light;
     }
+
+    public static Counters pushButton(Button button, Counters machineStatus) {
+        return new Counters(machineStatus
+                .stream()
+                .map(counter ->
+                        pushButtonForCounter(button, counter)
+                ).toList());
+    }
+
+    private static Counter pushButtonForCounter(Button button, Counter counter) {
+        return button.lightIndexes.contains(counter.index())
+                ? Counter.incr(counter)
+                : counter;
+    }
 }
