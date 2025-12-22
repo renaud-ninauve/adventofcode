@@ -1,5 +1,8 @@
 package fr.ninauve.renaud.adventofcode.year2025.day09;
 
+import java.util.List;
+import java.util.TreeMap;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.naturalOrder;
@@ -24,6 +27,14 @@ public record Rectangle(Point corner1, Point corner2) {
 
     public long area() {
         return width() * height();
+    }
+
+    public Stream<Horizontal> horizontals() {
+        return LongStream.rangeClosed(topLeft().row().value(), bottomRight().row().value())
+                .mapToObj(Row::new)
+                .map(r ->
+                        new Horizontal(new Point(topLeft().col(), r),
+                                new Point(bottomRight().col(), r)));
     }
 
     public Point topLeft() {

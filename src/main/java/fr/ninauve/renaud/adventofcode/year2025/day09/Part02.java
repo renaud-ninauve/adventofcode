@@ -2,8 +2,8 @@ package fr.ninauve.renaud.adventofcode.year2025.day09;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -15,39 +15,24 @@ public class Part02 {
     }
 
     public static long solve(List<String> input) {
-        List<Point> points = parse(input);
-        Map<Rectangle, Long> areas = areas(points);
-        TreeMap<Row, TreeSet<Col>> indexedPoints = indexPoints(points);
+        final List<Point> points = parse(input);
+        final Map<Rectangle, Long> areas = areas(points);
+        final TreeMap<Row, List<Line>> lines = lines(points);
+        final TreeMap<Row, List<Horizontal>> insideHorizontals = insideHorizontals(lines);
+
         return areas.entrySet()
                 .stream()
                 .filter(e -> {
                     Rectangle rectangle = e.getKey();
-                    Point topLeft = rectangle.topLeft();
-                    Point bottomRight = rectangle.bottomRight();
-                    boolean isBottomRightAPoint = bottomRight.equals(rectangle.corner1()) || bottomRight.equals(rectangle.corner2());
-                    boolean isTopLeftAPoint = topLeft.equals(rectangle.corner1()) || topLeft.equals(rectangle.corner2());
-                    SortedMap<Row, TreeSet<Col>> rows = indexedPoints.subMap(topLeft.row(), true, bottomRight.row(), true);
-                    if (rows.entrySet().stream()
-                            .anyMatch(rowCols -> {
-                                Row row = rowCols.getKey();
-                                Col minCol = rowCols.getValue().getFirst();
-                                boolean lastRow = row.compareTo(bottomRight.row()) == 0;
-                                return (!lastRow || isBottomRightAPoint)
-                                        && minCol.compareTo(topLeft.col()) > 0;
-                            })) {
-                        return false;
-                    }
-                    return rows.entrySet().stream()
-                            .anyMatch(rowCols -> {
-                                Row row = rowCols.getKey();
-                                Col maxCol = rowCols.getValue().getLast();
-                                boolean firstRow = row.compareTo(topLeft.row()) == 0;
-                                return (!firstRow || isTopLeftAPoint)
-                                        && maxCol.compareTo(bottomRight.col()) < 0;
+                    return rectangle.horizontals()
+                            .allMatch(h -> {
+                                List<Horizontal> insideHorizontalsRow = insideHorizontals.getOrDefault(h.row(), List.of());
+                                return insideHorizontalsRow.stream()
+                                        .anyMatch(i -> i.start().col().compareTo(h.start().col()) <= 0
+                                                && i.end().col().compareTo(h.end().col()) >= 0);
                             });
-                })
-                .map(Entry::getValue)
-                .mapToLong(l -> l)
+                }).map(Entry::getValue)
+                .mapToLong(Long::longValue)
                 .max()
                 .getAsLong();
     }
@@ -61,6 +46,46 @@ public class Part02 {
                             new Row(Long.parseLong(splitted[1]))
                     );
                 }).toList();
+    }
+
+    private static TreeMap<Row, List<Line>> lines(List<Point> points) {
+        TreeMap<Row, List<Line>> lines = new TreeMap<>();
+        for (int i = 0; i < points.size() - 1; i++) {
+            Point a = points.get(i);
+            Point b = points.get(i + 1);
+            if (a.row().equals(b.row())) {
+                List<Line> current = lines.getOrDefault(a.row(), new ArrayList<>());
+                current.add(new Horizontal(a, b));
+                lines.put(a.row(), current);
+            } else if (a.col().equals(b.col())) {
+                List<Line> current = lines.getOrDefault(a.row(), new ArrayList<>());
+                current.add(new Vertical(a, b));
+                lines.put(a.row(), current);
+            }
+        }
+        return lines;
+    }
+
+    private static TreeMap<Row, List<Horizontal>> insideHorizontals(TreeMap<Row, List<Line>> lines) {
+        Map<Point, List<Line>> indexedLines = lines.values().stream()
+                .flatMap(List::stream)
+                .flatMap(l -> l.endPoints().map(end -> new SimpleEntry<>(end, l)))
+                .collect(Collectors.groupingBy(Entry::getKey, Collectors.mapping(Entry::getValue, Collectors.toList())));
+
+        Map<Row, List<Horizontal>> horizontals = lines.values().stream()
+                .flatMap(List::stream)
+                .filter(l -> l instanceof Horizontal)
+                .map(l -> (Horizontal) l)
+                .collect(Collectors.groupingBy(Horizontal::row));
+
+        Row minRow = indexedLines.keySet().stream().map(Point::row).min(Comparator.naturalOrder()).get();
+        Row maxRow = indexedLines.keySet().stream().map(Point::row).max(Comparator.naturalOrder()).get();
+        TreeMap<Row, List<Horizontal>> inside = new TreeMap<>();
+        List<Horizontal> lastHorizontals = List.of();
+        for (long rowValue = minRow.value(); rowValue <= maxRow.value(); rowValue++) {
+            Row row = new Row(rowValue);
+
+        }
     }
 
     private static Map<Rectangle, Long> areas(List<Point> points) {
