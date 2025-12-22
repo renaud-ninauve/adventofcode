@@ -86,6 +86,7 @@ public class Part02 {
             Row row = new Row(rowValue);
 
         }
+        return null;
     }
 
     private static Map<Rectangle, Long> areas(List<Point> points) {
