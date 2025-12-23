@@ -2,10 +2,11 @@ package fr.ninauve.renaud.adventofcode.year2025.day09;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 public class Part02 {
 
@@ -16,25 +17,39 @@ public class Part02 {
 
     public static long solve(List<String> input) {
         final List<Point> points = parse(input);
-        final Map<Rectangle, Long> areas = areas(points);
-        final TreeMap<Row, List<Line>> lines = lines(points);
-        final TreeMap<Row, List<Horizontal>> insideHorizontals = insideHorizontals(lines);
+        final Scale compactScale = compactScale(points);
+        final Row maxRow = compactScale.scaleRows().getLast().scaled();
+        final Col maxCol = compactScale.scaleCols().getLast().scaled();
+        final List<Point> compactPoints = applyScale(compactScale, points);
+        final Set<Point> lines = lines(compactPoints);
+        final Set<Point> outsideArea = outsideArea(maxRow, maxCol, lines);
 
-        return areas.entrySet()
+        print(compactPoints, lines, outsideArea, maxRow, maxCol);
+
+        final Rectangle biggestRectangle = areas(compactPoints)
+                .entrySet()
                 .stream()
+                .sorted(Comparator.comparing(Map.Entry::getValue, Comparator.reverseOrder()))
                 .filter(e -> {
                     Rectangle rectangle = e.getKey();
-                    return rectangle.horizontals()
-                            .allMatch(h -> {
-                                List<Horizontal> insideHorizontalsRow = insideHorizontals.getOrDefault(h.row(), List.of());
-                                return insideHorizontalsRow.stream()
-                                        .anyMatch(i -> i.start().col().compareTo(h.start().col()) <= 0
-                                                && i.end().col().compareTo(h.end().col()) >= 0);
-                            });
-                }).map(Entry::getValue)
-                .mapToLong(Long::longValue)
-                .max()
-                .getAsLong();
+                    return rectangle.borders()
+                            .stream()
+                            .noneMatch(outsideArea::contains);
+                })
+                .filter(e -> {
+                    Rectangle rectangle = e.getKey();
+                    return rectangle.inside()
+                            .stream()
+                            .noneMatch(outsideArea::contains);
+                })
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .get();
+
+        Scale uncompactScale = compactScale.invert();
+        List<Point> uncompactedCorners = applyScale(uncompactScale, List.of(biggestRectangle.topLeft(), biggestRectangle.bottomRight()));
+        Rectangle uncompactedBiggestRectangle = new Rectangle(uncompactedCorners.getFirst(), uncompactedCorners.getLast());
+        return uncompactedBiggestRectangle.area();
     }
 
     private static List<Point> parse(List<String> input) {
@@ -48,45 +63,123 @@ public class Part02 {
                 }).toList();
     }
 
-    private static TreeMap<Row, List<Line>> lines(List<Point> points) {
-        TreeMap<Row, List<Line>> lines = new TreeMap<>();
-        for (int i = 0; i < points.size() - 1; i++) {
-            Point a = points.get(i);
-            Point b = points.get(i + 1);
+    record ScaleElement<T>(T origin, T scaled) {
+    }
+
+    record Scale(List<ScaleElement<Col>> scaleCols, List<ScaleElement<Row>> scaleRows) {
+        Scale invert() {
+            List<ScaleElement<Col>> invertedCols = scaleCols.stream()
+                    .map(s -> new ScaleElement<Col>(s.scaled(), s.origin()))
+                    .toList();
+            List<ScaleElement<Row>> invertedRows = scaleRows.stream()
+                    .map(s -> new ScaleElement<Row>(s.scaled(), s.origin()))
+                    .toList();
+            return new Scale(invertedCols, invertedRows);
+        }
+    }
+
+    private static Scale compactScale(List<Point> points) {
+        TreeSet<Col> colsSet = points.stream()
+                .map(Point::col)
+                .collect(Collectors.toCollection(TreeSet::new));
+        AtomicInteger colIndex = new AtomicInteger(0);
+        List<ScaleElement<Col>> scaleCols = colsSet.stream()
+                .map(col -> new ScaleElement<>(col, new Col(colIndex.getAndIncrement())))
+                .toList();
+
+        TreeSet<Row> rowsSet = points.stream()
+                .map(Point::row)
+                .collect(Collectors.toCollection(TreeSet::new));
+        AtomicInteger rowIndex = new AtomicInteger(0);
+        List<ScaleElement<Row>> scaleRows = rowsSet.stream()
+                .map(row -> new ScaleElement<>(row, new Row(rowIndex.getAndIncrement())))
+                .toList();
+
+        return new Scale(scaleCols, scaleRows);
+    }
+
+    private static void print(List<Point> points, Set<Point> lines, Set<Point> outside, Row maxRow, Col maxCol) {
+        for (long row = 0; row <= maxRow.value(); row++) {
+            StringBuilder sb = new StringBuilder();
+            for (long col = 0; col <= maxCol.value(); col++) {
+                Point point = new Point(new Row(row), new Col(col));
+                if (points.contains(point)) {
+                    sb.append("#");
+                } else if (lines.contains(point)) {
+                    sb.append("X");
+                } else if (outside.contains(point)) {
+                    sb.append("O");
+                } else {
+                    sb.append(".");
+                }
+            }
+            System.out.println(sb);
+        }
+    }
+
+    private static List<Point> applyScale(Scale scale, List<Point> points) {
+        final Map<Col, Col> scaleCols = scale.scaleCols()
+                .stream()
+                .collect(Collectors.toMap(ScaleElement::origin, ScaleElement::scaled));
+        final Map<Row, Row> scaleRows = scale.scaleRows()
+                .stream()
+                .collect(Collectors.toMap(ScaleElement::origin, ScaleElement::scaled));
+
+        return points.stream()
+                .map(p -> new Point(scaleCols.get(p.col()), scaleRows.get(p.row())))
+                .toList();
+    }
+
+    private static Set<Point> lines(List<Point> points) {
+        List<Point> pointsAndOrigin = new ArrayList<>(points);
+        pointsAndOrigin.add(points.getFirst());
+        final Set<Point> lines = new HashSet<>();
+        for (int i = 0; i < pointsAndOrigin.size() - 1; i++) {
+            Point a = pointsAndOrigin.get(i);
+            Point b = pointsAndOrigin.get(i + 1);
             if (a.row().equals(b.row())) {
-                List<Line> current = lines.getOrDefault(a.row(), new ArrayList<>());
-                current.add(new Horizontal(a, b));
-                lines.put(a.row(), current);
+                Col minCol = Stream.of(a, b).map(Point::col).min(Comparator.naturalOrder()).get();
+                Col maxCol = Stream.of(a, b).map(Point::col).max(Comparator.naturalOrder()).get();
+                List<Point> line = LongStream.rangeClosed(minCol.value(), maxCol.value())
+                        .mapToObj(colValue -> new Point(new Col(colValue), a.row()))
+                        .toList();
+                lines.addAll(line);
             } else if (a.col().equals(b.col())) {
-                List<Line> current = lines.getOrDefault(a.row(), new ArrayList<>());
-                current.add(new Vertical(a, b));
-                lines.put(a.row(), current);
+                Row minRow = Stream.of(a, b).map(Point::row).min(Comparator.naturalOrder()).get();
+                Row maxRow = Stream.of(a, b).map(Point::row).max(Comparator.naturalOrder()).get();
+                List<Point> line = LongStream.rangeClosed(minRow.value(), maxRow.value())
+                        .mapToObj(rowValue -> new Point(new Row(rowValue), a.col()))
+                        .toList();
+                lines.addAll(line);
+            } else {
+                throw new IllegalArgumentException();
             }
         }
         return lines;
     }
 
-    private static TreeMap<Row, List<Horizontal>> insideHorizontals(TreeMap<Row, List<Line>> lines) {
-        Map<Point, List<Line>> indexedLines = lines.values().stream()
-                .flatMap(List::stream)
-                .flatMap(l -> l.endPoints().map(end -> new SimpleEntry<>(end, l)))
-                .collect(Collectors.groupingBy(Entry::getKey, Collectors.mapping(Entry::getValue, Collectors.toList())));
+    private static Set<Point> outsideArea(Row maxRow, Col maxCol, Set<Point> lines) {
+        Set<Point> visited = new HashSet<>();
+        Set<Point> outsideArea = new HashSet<>();
+        Queue<Point> toVisit = new LinkedList<>();
+        toVisit.addAll(List.of(
+                new Point(new Row(0), new Col(0)),
+                new Point(new Row(0), maxCol),
+                new Point(maxRow, new Col(0)),
+                new Point(maxRow, maxCol)));
 
-        Map<Row, List<Horizontal>> horizontals = lines.values().stream()
-                .flatMap(List::stream)
-                .filter(l -> l instanceof Horizontal)
-                .map(l -> (Horizontal) l)
-                .collect(Collectors.groupingBy(Horizontal::row));
-
-        Row minRow = indexedLines.keySet().stream().map(Point::row).min(Comparator.naturalOrder()).get();
-        Row maxRow = indexedLines.keySet().stream().map(Point::row).max(Comparator.naturalOrder()).get();
-        TreeMap<Row, List<Horizontal>> inside = new TreeMap<>();
-        List<Horizontal> lastHorizontals = List.of();
-        for (long rowValue = minRow.value(); rowValue <= maxRow.value(); rowValue++) {
-            Row row = new Row(rowValue);
-
+        while (!toVisit.isEmpty()) {
+            Point point = toVisit.poll();
+            if (visited.contains(point)) {
+                continue;
+            }
+            visited.add(point);
+            if (!lines.contains(point)) {
+                outsideArea.add(point);
+                toVisit.addAll(point.upDownLeftRight(maxRow, maxCol));
+            }
         }
-        return null;
+        return outsideArea;
     }
 
     private static Map<Rectangle, Long> areas(List<Point> points) {
@@ -100,15 +193,5 @@ public class Part02 {
             }
         }
         return areas;
-    }
-
-    private static TreeMap<Row, TreeSet<Col>> indexPoints(List<Point> points) {
-        return points.stream()
-                .collect(
-                        Collectors.groupingBy(
-                                Point::row,
-                                TreeMap::new,
-                                Collectors.mapping(Point::col, Collectors.toCollection(TreeSet::new))
-                        ));
     }
 }

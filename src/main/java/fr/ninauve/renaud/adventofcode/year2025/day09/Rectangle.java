@@ -1,8 +1,7 @@
 package fr.ninauve.renaud.adventofcode.year2025.day09;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
-import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.naturalOrder;
@@ -29,12 +28,28 @@ public record Rectangle(Point corner1, Point corner2) {
         return width() * height();
     }
 
-    public Stream<Horizontal> horizontals() {
-        return LongStream.rangeClosed(topLeft().row().value(), bottomRight().row().value())
-                .mapToObj(Row::new)
-                .map(r ->
-                        new Horizontal(new Point(topLeft().col(), r),
-                                new Point(bottomRight().col(), r)));
+    public List<Point> borders() {
+        List<Point> points = new ArrayList<>();
+        for (long row = topLeft().row().value(); row <= bottomRight().row().value(); row++) {
+            points.add(new Point(new Row(row), topLeft().col()));
+            points.add(new Point(new Row(row), bottomRight().col()));
+        }
+        for (long col = topLeft().col().value(); col <= bottomRight().col().value(); col++) {
+            points.add(new Point(topLeft().row(), new Col(col)));
+            points.add(new Point(bottomRight().row(), new Col(col)));
+        }
+        return points;
+    }
+
+    public List<Point> inside() {
+        List<Point> points = new ArrayList<>();
+        for (long row = topLeft().row().value(); row <= bottomRight().row().value(); row++) {
+            for (long col = topLeft().col().value(); col <= bottomRight().col().value(); col++) {
+                points.add(new Point(new Row(row), new Col(col)));
+            }
+        }
+
+        return points;
     }
 
     public Point topLeft() {
